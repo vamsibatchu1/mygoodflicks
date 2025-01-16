@@ -85,22 +85,26 @@ export default function Page() {
 
             {/* Show Details Card */}
             <Card className="mb-8">
-              <CardContent className="py-6 px-6">
-                <div className="flex gap-6">
-                  <div className="relative w-[180px] h-[240px] bg-muted rounded-md overflow-hidden">
+              <CardContent className="p-6">
+                {/* First Row: Image and Details */}
+                <div className="flex gap-6 mb-6 h-[200px]">
+                  {/* Left Column: Image */}
+                  <div className="w-[150px] h-full relative bg-muted rounded-md overflow-hidden">
                     <Image
                       src={show.imageUrl}
                       alt={show.title}
                       fill
                       className="object-cover"
+                      priority
                     />
                   </div>
 
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-4">
+                  {/* Right Column: Title and Details */}
+                  <div className="flex-1 flex flex-col h-full">
+                    <div className="flex items-start justify-between mb-2">
                       <div>
                         <h1 className="text-2xl font-bold mb-2">{show.title}</h1>
-                        <div className="flex gap-2 mb-4">
+                        <div className="flex gap-2 mb-2">
                           {show.genres.map((genre) => (
                             <Badge key={genre} variant="secondary">{genre}</Badge>
                           ))}
@@ -126,36 +130,36 @@ export default function Page() {
                         </DropdownMenu>
                       </div>
                     </div>
-
-                    <p className="text-muted-foreground mb-6">
+                    <p className="text-muted-foreground flex-grow line-clamp-4">
                       {show.description}
                     </p>
-
-                    {/* Ratings Section */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <Card className="p-4">
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Based on your movie preferences, you are highly likely to enjoy this series
-                        </p>
-                      </Card>
-                      <Card className="p-4">
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm font-medium">Your network</p>
-                          <Users className="h-4 w-4 text-primary" />
-                        </div>
-                        <p className="text-2xl font-bold">{show.ratings.networkScore}/5</p>
-                      </Card>
-                      <Card className="p-4">
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm font-medium">All time</p>
-                          <Users className="h-4 w-4 text-primary" />
-                        </div>
-                        <p className="text-2xl font-bold">{show.ratings.allTimeScore}/5</p>
-                      </Card>
-                    </div>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-4 pt-6">
+
+                {/* Second Row: Ratings Section */}
+                <div className="grid grid-cols-3 gap-4">
+                  <Card className="p-4">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Based on your movie preferences, you are highly likely to enjoy this series
+                    </p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm font-medium">Your network</p>
+                      <Users className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="text-2xl font-bold">{show.ratings.networkScore}/5</p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm font-medium">All time</p>
+                      <Users className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="text-2xl font-bold">{show.ratings.allTimeScore}/5</p>
+                  </Card>
+                </div>
+
+                <p className="text-sm text-muted-foreground mt-6">
                   {show.watchlistCount} friends added it to their watchlist
                 </p>
               </CardContent>
