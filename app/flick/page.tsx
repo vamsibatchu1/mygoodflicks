@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Star, BookmarkPlus, MoreVertical, Filter, Share2, Home, Users, BookMarked, Activity } from 'lucide-react'
+import { Star, BookmarkPlus, MoreVertical, Home, Users, BookMarked, Activity } from 'lucide-react'
 import { Show } from './types'
 
 export default function Page() {
@@ -24,8 +24,7 @@ export default function Page() {
   useEffect(() => {
     const fetchShowData = async () => {
       try {
-        // Update the fetch URL to include the full path
-        const response = await fetch('http://localhost:3001/api/flick')
+        const response = await fetch('/api/flick')
         const data = await response.json()
         setShow(data)
       } catch (error) {
@@ -179,7 +178,9 @@ export default function Page() {
                         <h3 className="font-medium">{review.name}</h3>
                         <span className="text-xl font-bold">{review.rating}</span>
                       </div>
-                      <p className="text-muted-foreground">{review.review}</p>
+                      <p className="text-muted-foreground" dangerouslySetInnerHTML={{ 
+                        __html: review.review.replace(/'/g, '&apos;') 
+                      }} />
                     </div>
                   </div>
                 ))}
