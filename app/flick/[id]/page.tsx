@@ -15,35 +15,39 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Star, BookmarkPlus, MoreVertical, Home, Users, BookMarked, Activity } from 'lucide-react'
-import { Show } from './types'
+import { Show } from '@/types'
+import { useParams } from 'next/navigation'
 
 export default function Page() {
-  const [show, setShow] = useState<Show | null>(null)
-  const [loading, setLoading] = useState(true)
+  const params = useParams();
+  const [show, setShow] = useState<Show | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchShowData = async () => {
       try {
-        const response = await fetch('/api/flick')
-        const data = await response.json()
-        setShow(data)
+        setLoading(true);
+        setError(null);
+        const response = await fetch(`/api/shows/${params.id}`);
+        if (!response.ok) throw new Error('Failed to fetch show');
+        const data = await response.json();
+        setShow(data);
       } catch (error) {
-        console.error('Error fetching show data:', error)
+        setError(error instanceof Error ? error.message : 'An error occurred');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
+    };
+
+    if (params.id) {
+      fetchShowData();
     }
+  }, [params.id]);
 
-    fetchShowData()
-  }, [])
-
-  if (loading) {
-    return <div>Loading...</div>
-  }
-
-  if (!show) {
-    return <div>Show not found</div>
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!show) return <div>Show not found</div>;
 
   return (
     <div className="flex min-h-screen bg-background">
