@@ -56,13 +56,20 @@ export default function ShowPage() {
           {/* Show Details Section */}
           <div className="flex gap-6 mb-6">
             <div className="w-[180px] h-[270px] relative bg-muted rounded-md overflow-hidden">
-              <Image
-                src={show.imageUrl}
-                alt={show.title}
-                fill
-                className="object-cover"
-                priority
-              />
+              {show?.imageUrl && (
+                <div className="relative h-auto max-w-[300px] rounded-lg overflow-hidden">
+                  <img 
+                    src={show.imageUrl} 
+                    alt={show.title || 'Movie poster'} 
+                    className="w-full h-auto rounded-lg"
+                    loading="eager"
+                  />
+                </div>
+              )}
+              <p className="mt-4">{show?.description}</p>
+              <div className="mt-4">
+                Genres: {show?.genres ? show.genres.join(', ') : 'No genres available'}
+              </div>
             </div>
             
             <div className="flex-1">
@@ -108,37 +115,39 @@ export default function ShowPage() {
             </Card>
             <Card className="p-4">
               <div className="flex justify-between items-center">
-                <p className="text-sm font-medium">Your network</p>
+                <p className="text-sm font-medium">IMDB Rating</p>
                 <Users className="h-4 w-4 text-primary" />
               </div>
-              <p className="text-2xl font-bold">{show.ratings.networkScore}/5</p>
+              <p className="text-2xl font-bold">{show?.ratings?.networkScore ? show.ratings.networkScore : '0.0'}</p>
             </Card>
             <Card className="p-4">
               <div className="flex justify-between items-center">
-                <p className="text-sm font-medium">All time</p>
+                <p className="text-sm font-medium">Metascore</p>
                 <Users className="h-4 w-4 text-primary" />
               </div>
-              <p className="text-2xl font-bold">{show.ratings.allTimeScore}/5</p>
+              <p className="text-2xl font-bold">{show.ratings.allTimeScore}</p>
             </Card>
           </div>
         </CardContent>
       </Card>
 
       {/* Reviews Section */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">
-          {show.reviewCount} reviews from your friends
-        </h2>
-        {show.reviews.map((review) => (
+      <h2 className="text-xl font-semibold mt-6 mb-4">
+        {show?.reviewCount || 0} reviews from your friends
+      </h2>
+      
+      {/* Only map if reviews exist */}
+      {show?.reviews && show.reviews.length > 0 ? (
+        show.reviews.map((review) => (
           <Card key={review.id} className="p-4 mb-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="font-medium">{review.name}</div>
-              <div className="text-sm text-muted-foreground">rated it {review.rating}/5</div>
             </div>
-            <p className="text-muted-foreground">{review.review}</p>
           </Card>
-        ))}
-      </div>
+        ))
+      ) : (
+        <p>No reviews yet</p>
+      )}
     </div>
   )
 }
