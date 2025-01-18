@@ -6,19 +6,31 @@ import { Show } from '@/types';
 // Error handling function
 export async function getShowDetails(showId: string) {
   try {
+    console.log('Fetching show details for ID:', showId);
+    
     const showRef = doc(db, 'shows', showId);
+    console.log('Created document reference');
+    
     const showSnap = await getDoc(showRef);
+    console.log('Got document snapshot, exists:', showSnap.exists());
     
     if (showSnap.exists()) {
-      return showSnap.data() as Show;
+      const data = showSnap.data() as Show;
+      console.log('Found existing show data:', data);
+      return data;
     }
     
+    console.log('Show not found, generating new data...');
     const showData = await generateShowDetails(showId);
+    console.log('Generated new show data:', showData);
+    
     await setDoc(showRef, showData);
+    console.log('Saved new show data to Firebase');
+    
     return showData;
   } catch (error) {
-    console.error('Error fetching show details:', error);
-    throw new Error('Failed to fetch show details');
+    console.error('Error in getShowDetails:', error);
+    throw new Error(`Failed to fetch show details: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -61,7 +73,7 @@ async function generateShowDetails(showTitle: string) {
       title: parsedData.title || showTitle,
       genres: parsedData.genres || [],
       description: parsedData.description || '',
-      imageUrl: '/placeholder.svg', // We'll handle images later
+      imageUrl: '/placeholder.svg',
       ratings: {
         networkScore: parsedData.ratings?.networkScore || "0",
         allTimeScore: parsedData.ratings?.allTimeScore || "0"
@@ -73,7 +85,6 @@ async function generateShowDetails(showTitle: string) {
       lastUpdated: new Date().toISOString()
     };
 
-    console.log('Generated show data:', showData);
     return showData;
   } catch (error) {
     console.error('Error generating show details:', error);
