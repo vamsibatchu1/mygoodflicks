@@ -15,6 +15,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+const reviewsData = [
+  {
+    name: "Martin Rashford",
+    rating: 3.4,
+    review: "I love the banter and the setting, but some of the storylines don't hold up as well today. Still, it's a feel-good series with unforgettable characters. Definitely worth watching if you enjoy slice-of-life dramas."
+  },
+  {
+    name: "Tony Dill",
+    rating: 3.4,
+    review: "This show got me through some tough times. It's funny, emotional, and just plain comforting. I especially loved how every character has depth, even the town gossip! Lorelai is my favorite—such a strong, independent woman."
+  },
+  {
+    name: "Jennifer Minz",
+    rating: 2.0,
+    review: "I don't understand the hype. The dialogue feels forced and overly snappy, and Rory's character becomes hard to root for as the series goes on. I gave up around season 5."
+  },
+  {
+    name: "Varsha G",
+    rating: 2.0,
+    review: "The first few seasons were delightful, but the later seasons lost their magic. Rory's character arc felt off to me, and some plotlines dragged on unnecessarily. However, Stars Hollow and its quirky residents kept me watching."
+  }
+];
+
 export default function ShowPage() {
   const params = useParams()
   const [show, setShow] = useState<Show | null>(null)
@@ -131,23 +154,24 @@ export default function ShowPage() {
         </CardContent>
       </Card>
 
-      {/* Reviews Section */}
-      <h2 className="text-xl font-semibold mt-6 mb-4">
-        {show?.reviewCount || 0} reviews from your friends
-      </h2>
-      
-      {/* Only map if reviews exist */}
-      {show?.reviews && show.reviews.length > 0 ? (
-        show.reviews.map((review) => (
-          <Card key={review.id} className="p-4 mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="font-medium">{review.name}</div>
+      <Card className="mt-8 p-6">
+        <h2 className="text-lg mb-6">{reviewsData.length} reviews from your friends</h2>
+
+        <div className="space-y-6">
+          {reviewsData.map((review, index) => (
+            <div key={index} className="flex gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex-shrink-0" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-base">{review.name}</span>
+                  <span className="font-medium text-lg">{review.rating}</span>
+                </div>
+                <p className="text-gray-600 text-base leading-relaxed">{review.review}</p>
+              </div>
             </div>
-          </Card>
-        ))
-      ) : (
-        <p>No reviews yet</p>
-      )}
+          ))}
+        </div>
+      </Card>
     </div>
   )
 }
