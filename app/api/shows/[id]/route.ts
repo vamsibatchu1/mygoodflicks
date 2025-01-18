@@ -2,21 +2,16 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 
-type RouteParams = {
-  params: {
-    id: string
-  }
-}
-
-export async function GET(_: Request, { params }: RouteParams) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const searchTerm = params.id
+  
   try {
-    const searchTerm = params.id
-    console.log('Searching for:', searchTerm)
-
     const OMDB_API_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY
     const omdbUrl = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(searchTerm)}`
     
-    console.log('Fetching from OMDB:', omdbUrl)
     const omdbResponse = await fetch(omdbUrl)
     const omdbData = await omdbResponse.json()
     
