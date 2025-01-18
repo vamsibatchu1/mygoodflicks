@@ -132,9 +132,9 @@ export default function ShowPage() {
           {/* Ratings Section */}
           <div className="grid grid-cols-3 gap-4">
             <Card className="p-4">
-              <p className="text-sm text-muted-foreground">
-                Based on your movie preferences, you are highly likely to enjoy this series
-              </p>
+            <p className="text-sm text-muted-foreground">
+                    {show.awards}
+                  </p>
             </Card>
             <Card className="p-4">
               <div className="flex justify-between items-center">
@@ -154,24 +154,30 @@ export default function ShowPage() {
         </CardContent>
       </Card>
 
-      <Card className="mt-8 p-6">
-        <h2 className="text-lg mb-6">{reviewsData.length} reviews from your friends</h2>
+      <div className="mt-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">{reviewsData.length} reviews from your friends</h2>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">All</Button>
+            <Button variant="outline" size="sm">Year</Button>
+          </div>
+        </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {reviewsData.map((review, index) => (
-            <div key={index} className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-base">{review.name}</span>
-                  <span className="font-medium text-lg">{review.rating}</span>
+            <div key={index} className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{review.name}</span>
+                  <span className="text-lg font-semibold">{review.rating}</span>
                 </div>
-                <p className="text-gray-600 text-base leading-relaxed">{review.review}</p>
+                <p className="text-gray-600">{review.review}</p>
               </div>
             </div>
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

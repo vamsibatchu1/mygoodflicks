@@ -22,6 +22,7 @@ export async function GET(
         title: omdbData.Title,
         description: omdbData.Plot,
         imageUrl: omdbData.Poster,
+        awards: omdbData.Awards,
         genres: omdbData.Genre ? omdbData.Genre.split(', ') : [],
         ratings: {
           networkScore: omdbData.imdbRating === 'N/A' ? 0 : parseFloat(omdbData.imdbRating),
