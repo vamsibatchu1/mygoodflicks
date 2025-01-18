@@ -140,9 +140,9 @@ export default function ShowPage() {
           <div className="grid grid-cols-3 gap-4">
             <Card className="p-4">
               <p className="text-sm text-muted-foreground">
-                {show?.awards && (
-                  <span className="block mt-2">🏆 {show.awards}</span>
-                )}
+               
+                  <span className="block mt-2">🏆</span>
+  
               </p>
             </Card>
             <Card className="p-4">
