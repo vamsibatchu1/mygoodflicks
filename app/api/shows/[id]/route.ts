@@ -1,13 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 
-export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
-) {
+type RouteParams = {
+  params: {
+    id: string
+  }
+}
+
+export async function GET(_: Request, { params }: RouteParams) {
   try {
-    const searchTerm = context.params.id
+    const searchTerm = params.id
     console.log('Searching for:', searchTerm)
 
     const OMDB_API_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY
