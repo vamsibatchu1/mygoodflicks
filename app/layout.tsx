@@ -7,8 +7,13 @@ import { NavWrapper } from '@/components/layout/nav-wrapper'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "MyGoodFlicks",
-  description: "Track and share your favorite shows",
+  title: "Goodflicks",
+  description: "Track and share your favorite shows and movies",
+  icons: {
+    icon: "/assets/images/favico/favicon.ico",
+    apple: "/assets/images/favico/apple-touch-icon.png",
+    shortcut: "/assets/images/favico/favicon.ico",
+  }
 }
 
 export default function RootLayout({
