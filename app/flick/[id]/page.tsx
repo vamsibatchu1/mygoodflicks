@@ -59,8 +59,8 @@ export default function ShowPage() {
               {show?.imageUrl && (
                 <div className="relative h-auto max-w-[300px] rounded-lg overflow-hidden">
                   <img 
-                    src={show.imageUrl} 
-                    alt={show.title || 'Movie poster'} 
+                    src={show.imageUrl}
+                    alt={show.title}
                     className="w-full h-auto rounded-lg"
                     loading="eager"
                   />
