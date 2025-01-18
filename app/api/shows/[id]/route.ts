@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const searchTerm = params.id
@@ -32,13 +32,13 @@ export async function GET(
       }
 
       await setDoc(showRef, showData)
-      return NextResponse.json(showData)
+      return Response.json(showData)
     }
     
-    return NextResponse.json({ error: 'Show not found' }, { status: 404 })
+    return Response.json({ error: 'Show not found' }, { status: 404 })
   } catch (error) {
     console.error('API Error:', error)
-    return NextResponse.json(
+    return Response.json(
       { error: 'Failed to fetch show' },
       { status: 500 }
     )
