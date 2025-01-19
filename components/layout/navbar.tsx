@@ -29,9 +29,9 @@ export function Navbar({ className }: NavbarProps) {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
           <img
-            src="/assets/images/logos/wordmark.png" // Add your wordmark image here
+            src="/assets/images/logos/nav-wordmark.png" // Add your wordmark image here
             alt="GoodFlicks"
-            className="h-6 w-auto" // Adjust size as needed
+            className="h-7 w-auto" // Adjust size as needed
           />
           </div>
 
