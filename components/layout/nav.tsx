@@ -1,3 +1,7 @@
+// Navigation bar
+// User menu
+// Route links
+
 'use client'
 
 import Link from 'next/link'
@@ -7,13 +11,13 @@ import { Home, Library, Activity, Film, Users, Settings } from 'lucide-react'
 
 const navItems = [
   {
-    title: 'Home',
-    href: '/dashboard',
+    title: 'Flick Finder',
+    href: '/flickfinder',
     icon: Home
   },
   {
     title: 'My Library',
-    href: '/show/107',
+    href: '/media/107',
     icon: Library
   },
   {
@@ -23,7 +27,7 @@ const navItems = [
   },
   {
     title: 'My Lists',
-    href: '/shows',
+    href: '/mylists',
     icon: Film
   },
   {

@@ -24,7 +24,7 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       await updateProfile(userCredential.user, { displayName: name })
       toast.success('Account created successfully!')
-      router.push('/dashboard')
+      router.push('/flickfinder')
     } catch (error) {
       toast.error('Failed to create account.')
     } finally {
@@ -35,15 +35,12 @@ export default function SignupPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Sign Up</h1>
-        <p className="text-gray-500">
-          Create an account to get started.
-        </p>
+      <h1 className="text-xl font-bold">Singup to get started</h1>
       </div>
 
       <form onSubmit={handleSignup} className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium">
+          <label htmlFor="name" className="text-left block">
             Name
           </label>
           <Input
@@ -56,7 +53,7 @@ export default function SignupPage() {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
+          <label htmlFor="email" className="text-left block">
             Email
           </label>
           <Input
@@ -70,7 +67,7 @@ export default function SignupPage() {
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="password" className="text-sm font-medium">
+          <label htmlFor="password" className="text-left block">
             Password
           </label>
           <Input

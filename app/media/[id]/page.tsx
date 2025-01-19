@@ -1,3 +1,7 @@
+// Dynamic route for movies/shows
+// OMDB data integration
+// Add to list functionality
+
 "use client";
 
 import { useParams } from "next/navigation";
@@ -60,14 +64,15 @@ export default function ShowPage() {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching show data for:", params.id); // Debug log
+        console.log("Fetching show with ID:", params.id);
         const response = await fetch(`/api/shows/${params.id}`);
+        console.log("Response status:", response.status);
         if (!response.ok) throw new Error("Failed to fetch show");
         const data = await response.json();
-        console.log("Received show data:", data); // Debug log
+        console.log("Received data:", data);
         setShow(data);
       } catch (error) {
-        console.error("Error fetching show:", error); // Debug log
+        console.error("Detailed error:", error);
         setError(error instanceof Error ? error.message : "An error occurred");
       } finally {
         setLoading(false);
@@ -105,7 +110,7 @@ export default function ShowPage() {
     try {
       await listsService.addItemToList(listId, {
         id: params.id,
-        type: params.type as 'movie' | 'show',
+        type: show?.Type?.toLowerCase() as 'movie' | 'show',
         title: show?.title || show?.name || '',
         posterPath: show?.imageUrl,
         addedAt: new Date()
@@ -116,7 +121,7 @@ export default function ShowPage() {
         if (list.id === listId) {
           return {
             ...list,
-            [`${params.type}Count`]: (list[`${params.type}Count`] || 0) + 1,
+            [`${show?.Type?.toLowerCase()}Count`]: (list[`${show?.Type?.toLowerCase()}Count`] || 0) + 1,
             lastUpdated: new Date()
           };
         }
@@ -282,7 +287,7 @@ export default function ShowPage() {
         </Button>
         <AddToListButton 
           mediaId={params.id}
-          mediaType={params.type as 'movie' | 'show'}
+          mediaType={show?.Type?.toLowerCase() as 'movie' | 'show'}
           title={show?.title || show?.name || ''}
           posterPath={show?.imageUrl}
         />

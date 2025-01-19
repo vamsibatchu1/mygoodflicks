@@ -1,3 +1,7 @@
+// Login form
+// Firebase authentication
+// Redirects after successful login
+
 'use client'
 
 import { useState } from 'react'
@@ -22,7 +26,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password)
       toast.success('Logged in successfully!')
-      router.push('/dashboard')
+      router.push('/flickfinder')
     } catch (error) {
       toast.error('Failed to login. Please check your credentials.')
     } finally {
@@ -33,17 +37,13 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Login</h1>
-        <p className="text-gray-500">
-          Enter your email below to login to your account.
-        </p>
+        <h1 className="text-xl font-bold">Login to your account</h1>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
+        <label className="text-left block">Email</label>
+
           <Input
             id="email"
             type="email"

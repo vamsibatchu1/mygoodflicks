@@ -1,3 +1,8 @@
+// Firebase CRUD operations
+// List management functions
+// Real-time updates
+
+
 import { db } from "@/lib/firebase";
 import { 
   collection, 

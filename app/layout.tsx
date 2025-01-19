@@ -1,3 +1,8 @@
+// Root layout with providers
+// Includes AuthProvider, Toaster
+// Sets up basic HTML structure and metadata
+
+
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"

@@ -1,3 +1,7 @@
+// Authentication context
+// User state management
+// Firebase auth integration
+
 "use client";
 
 import { createContext, useEffect, useState } from "react";

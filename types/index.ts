@@ -1,3 +1,6 @@
+// TypeScript interfaces
+// Shared types for media, lists, user
+
 export interface Review {
   id: string;
   name: string;

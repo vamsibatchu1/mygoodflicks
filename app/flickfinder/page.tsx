@@ -1,3 +1,7 @@
+// User dashboard
+// Shows personalized content
+// Quick access to lists and recent activity
+
 "use client"
 
 import * as React from "react"
@@ -15,6 +19,8 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
+import { toast } from "sonner"
 
 const streamingServices = [
   { name: "Netflix", logo: "/assets/images/logos/netflix.png" },
@@ -25,15 +31,59 @@ const streamingServices = [
   { name: "Other", logo: "/assets/images/logos/disney.png" }, // No logo for "Other"
 ]
 
+// First, add this type for the media results
+type MediaResult = {
+  Title: string;
+  Year: string;
+  Poster: string;
+  Type: string;
+  imdbRating: string;
+  Plot: string;
+}
+
 export default function DashboardPage() {
   const [selectedMoods, setSelectedMoods] = React.useState<string[]>([])
   const [selectedTime, setSelectedTime] = React.useState<string>("")
   const [selectedRating, setSelectedRating] = React.useState<string>("")
   const [selectedRelease, setSelectedRelease] = React.useState<string>("")
+  const [results, setResults] = useState<MediaResult[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleGetRecommendations = async () => {
+    setIsLoading(true)
+    try {
+      const formData = {
+        moods: selectedMoods,
+        watchTime: selectedTime,
+        ratingPreference: selectedRating,
+        releaseTime: selectedRelease,
+      }
+      console.log('Sending form data:', formData)
+
+      const response = await fetch('/api/recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      
+      console.log('Response status:', response.status)
+      const data = await response.json()
+      console.log('Received data:', data)
+      
+      setResults(data)
+    } catch (error) {
+      console.error('Detailed error:', error)
+      toast.error('Failed to get recommendations')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Get watching in secs</h1>
+      <h1 className="text-2xl font-bold mb-4">🍿 Flick Finder: Your Personal Movie DJ</h1>
       <main className="flex-1 p-6">
         <Card className="max-w-2xl mx-auto">
           <CardContent className="p-6 space-y-6">            
@@ -266,9 +316,54 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <Button className="w-full">Show me my shows now</Button>
+            <Button 
+              className="w-full" 
+              onClick={handleGetRecommendations}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Finding the perfect shows...' : 'Show me my shows now'}
+            </Button>
           </CardContent>
         </Card>
+
+        {results.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Your Recommendations</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {results.map((media, index) => (
+                <Card key={index} className="overflow-hidden">
+                  <div className="relative aspect-[2/3]">
+                    {media.Poster && media.Poster !== "N/A" ? (
+                      <img
+                        src={media.Poster}
+                        alt={media.Title}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        No Poster Available
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="font-bold text-lg mb-2">{media.Title}</h3>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {media.Year} • {media.Type} • ⭐ {media.imdbRating}
+                    </p>
+                    <p className="text-sm line-clamp-3">{media.Plot}</p>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-4"
+                      asChild
+                    >
+                      <Link href={`/media/${media.imdbID}`}>View Details</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

@@ -1,48 +1,67 @@
-import { NextRequest } from 'next/server'
+// OMDB API integration
+// Media data fetching
+// Error handling
+
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 
 export async function GET(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
-  const searchTerm = params.id
-  
-  try {
-    const OMDB_API_KEY = process.env.NEXT_PUBLIC_OMDB_API_KEY
-    const omdbUrl = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(searchTerm)}`
-    
-    const omdbResponse = await fetch(omdbUrl)
-    const omdbData = await omdbResponse.json()
-    
-    if (omdbData.Response === "True") {
-      const showRef = doc(db, 'shows', searchTerm)
-      const showData = {
-        id: searchTerm,
-        title: omdbData.Title,
-        description: omdbData.Plot,
-        imageUrl: omdbData.Poster,
-        awards: omdbData.Awards,
-        genres: omdbData.Genre ? omdbData.Genre.split(', ') : [],
-        ratings: {
-          networkScore: omdbData.imdbRating === 'N/A' ? 0 : parseFloat(omdbData.imdbRating),
-          allTimeScore: omdbData.Metascore === 'N/A' ? 0 : parseInt(omdbData.Metascore),
-          imdbVotes: omdbData.imdbVotes === 'N/A' ? 0 : parseInt(omdbData.imdbVotes.replace(/,/g, '')),
-          rottenTomatoes: "N/A"
-        }
-      }
-
-      await setDoc(showRef, showData)
-      return Response.json(showData)
-    }
-    
-    return Response.json({ error: 'Show not found' }, { status: 404 })
-  } catch (error) {
-    console.error('API Error:', error)
-    return Response.json(
-      { error: 'Failed to fetch show' },
+  if (!process.env.OMDB_API_KEY) {
+    console.error("OMDB API key is not defined");
+    return NextResponse.json(
+      { error: "API configuration error" },
       { status: 500 }
-    )
+    );
+  }
+
+  try {
+    console.log("Fetching from OMDB with ID:", params.id);
+    console.log("API URL:", `http://www.omdbapi.com/?i=${params.id}&apikey=${process.env.OMDB_API_KEY}`);
+    
+    const response = await fetch(
+      `http://www.omdbapi.com/?i=${params.id}&apikey=${process.env.OMDB_API_KEY}`,
+      { cache: 'no-store' }  // Disable caching for debugging
+    );
+
+    console.log("OMDB Response status:", response.status);
+    const data = await response.json();
+    console.log("OMDB Response data:", data);
+
+    if (data.Response === 'False') {
+      return NextResponse.json(
+        { error: data.Error || "Show not found" },
+        { status: 404 }
+      );
+    }
+
+    const showRef = doc(db, 'shows', params.id)
+    const showData = {
+      id: params.id,
+      title: data.Title,
+      description: data.Plot,
+      imageUrl: data.Poster,
+      awards: data.Awards,
+      genres: data.Genre ? data.Genre.split(', ') : [],
+      ratings: {
+        networkScore: data.imdbRating === 'N/A' ? 0 : parseFloat(data.imdbRating),
+        allTimeScore: data.Metascore === 'N/A' ? 0 : parseInt(data.Metascore),
+        imdbVotes: data.imdbVotes === 'N/A' ? 0 : parseInt(data.imdbVotes.replace(/,/g, '')),
+        rottenTomatoes: "N/A"
+      }
+    }
+
+    await setDoc(showRef, showData)
+    return NextResponse.json(showData)
+  } catch (error) {
+    console.error("Error in API route:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch show" },
+      { status: 500 }
+    );
   }
 }
 

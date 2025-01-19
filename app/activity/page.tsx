@@ -1,3 +1,7 @@
+// Shows user activity feed
+// Lists recent interactions with movies/shows
+// Integrates with Firebase for activity data
+
 export default function ActivityPage() {
   return (
     <div className="p-6">

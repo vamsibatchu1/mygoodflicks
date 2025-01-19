@@ -1,3 +1,7 @@
+// User's media lists
+// List management
+// Show/movie counts
+
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
