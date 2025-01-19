@@ -10,6 +10,7 @@ import { Toaster } from 'sonner'
 import { NavWrapper } from '@/components/layout/nav-wrapper'
 import { AuthProvider } from "@/context/auth"
 import { Navbar } from '@/components/layout/navbar'
+import '@/styles/marquee.scss'
 
 const inter = Inter({ subsets: ["latin"] })
 

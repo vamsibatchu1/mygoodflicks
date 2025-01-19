@@ -13,7 +13,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { toast } from 'sonner'
 
-export default function LoginPage() {
+export default function Login() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -35,44 +35,34 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-xl font-bold">Login to your account</h1>
-      </div>
-
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div className="space-y-2">
-        <label className="text-left block">Email</label>
-
-          <Input
-            id="email"
-            type="email"
+    <div className="rounded-2xl bg-zinc-100 p-8">
+      <h1 className="mb-6 text-2xl font-semibold text-center">Login to your account</h1>
+      
+      <div className="space-y-4">
+        <div className="space-y-2 text-left">
+          <label className="text-sm font-medium">Email</label>
+          <Input 
+            type="email" 
             placeholder="Enter your email"
+            className="bg-white"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 text-left">
           <div className="flex items-center justify-between">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm text-gray-500 hover:text-gray-900"
-            >
+            <label className="text-sm font-medium">Password</label>
+            <Link href="/auth/forgot-password" className="text-sm text-zinc-600 hover:text-zinc-800">
               Forgot your password?
             </Link>
           </div>
-          <Input
-            id="password"
-            type="password"
+          <Input 
+            type="password" 
             placeholder="Enter your password"
+            className="bg-white"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
         </div>
 
@@ -83,22 +73,26 @@ export default function LoginPage() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </Button>
-      </form>
 
-      <div className="space-y-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {/* Add Google login logic */}}
-        >
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-zinc-100 px-2 text-zinc-500">Or continue with</span>
+          </div>
+        </div>
+
+        <Button variant="outline" className="w-full bg-white">
           Login with Google
         </Button>
 
-        <div className="text-center text-sm">
-          <Link href="/auth/signup" className="text-gray-500 hover:text-gray-900">
-            Don&apos;t have an account? Sign up
+        <p className="text-center text-sm text-zinc-600">
+          Don&apos;t have an account?{" "}
+          <Link href="/auth/signup" className="font-medium text-zinc-900 hover:underline">
+            Sign up
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   )

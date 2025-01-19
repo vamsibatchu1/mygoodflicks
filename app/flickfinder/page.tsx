@@ -89,10 +89,10 @@ export default function DashboardPage() {
     <div className="container mx-auto px-6 sm:px-8 py-8 sm:py-12">
       <div className="flex gap-12">
         <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-6">🍿 Flick Finder: Your Personal Movie DJ</h1>
           <main className="flex-1 p-1">
             <Card className="max-w-2xl mx-auto">
-              <CardContent className="p-6 space-y-6">            
+              <CardContent className="p-6 space-y-6"> 
+              <h1 className="text-2xl font-bold mb-6">Flick Finder: Your Personal Movie DJ</h1>           
                 <div className="space-y-16 sm:space-y-6">
                   <div className="flex flex-col min-h-[120px] sm:min-h-fit mb-8 sm:mb-0">
                     <h2 className="text-base font-medium flex items-center gap-2">
@@ -345,30 +345,33 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-bold">{show.Title}</h3>
                     <p className="text-sm text-gray-600 line-clamp-2">{show.Plot}</p>
                     
-                    <div className="grid grid-cols-2 gap-3">
-                      {show.Ratings?.map((rating) => {
-                        if (rating.Source === "Rotten Tomatoes") {
-                          return (
-                            <div key={rating.Source}>
-                              <div className="text-xs text-gray-600">Rotten Tomatoes</div>
-                              <div className="font-bold text-sm">{rating.Value}</div>
-                            </div>
-                          )
-                        }
-                        if (rating.Source === "Internet Movie Database") {
-                          return (
-                            <div key={rating.Source}>
-                              <div className="text-xs text-gray-600">IMDB</div>
-                              <div className="font-bold text-sm">{rating.Value}</div>
-                            </div>
-                          )
-                        }
-                        return null
-                      })}
-                    </div>
+                    {show.Ratings && show.Ratings.length > 0 && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {show.Ratings.map((rating) => {
+                          switch(rating.Source) {
+                            case "Rotten Tomatoes":
+                              return (
+                                <div key="rt">
+                                  <div className="text-xs text-gray-600">Rotten Tomatoes</div>
+                                  <div className="font-bold text-sm">{rating.Value}</div>
+                                </div>
+                              );
+                            case "Internet Movie Database":
+                              return (
+                                <div key="imdb">
+                                  <div className="text-xs text-gray-600">IMDB</div>
+                                  <div className="font-bold text-sm">{rating.Value}</div>
+                                </div>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
+                      </div>
+                    )}
 
                     {show.Awards && show.Awards !== 'N/A' && (
-                      <p className="text-xs text-gray-600">{show.Awards}</p>
+                      <p className="text-xs text-gray-600 italic">{show.Awards}</p>
                     )}
                   </div>
                 </div>

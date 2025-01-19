@@ -9,7 +9,7 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { toast } from 'sonner'
 
-export default function SignupPage() {
+export default function SignUp() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -33,76 +33,49 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2 text-center">
-      <h1 className="text-xl font-bold">Singup to get started</h1>
-      </div>
-
-      <form onSubmit={handleSignup} className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="name" className="text-left block">
-            Name
-          </label>
-          <Input
-            id="name"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="email" className="text-left block">
-            Email
-          </label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="password" className="text-left block">
-            Password
-          </label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={loading}
-        >
-          {loading ? 'Creating account...' : 'Sign Up'}
-        </Button>
-      </form>
-
+    <div className="rounded-2xl bg-zinc-100 p-8">
+      <h1 className="mb-6 text-2xl font-semibold text-center">Create an account</h1>
+      
       <div className="space-y-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {/* Add Google signup logic */}}
-        >
+        <div className="space-y-2 text-left">
+          <label className="text-sm font-medium">Email</label>
+          <Input 
+            type="email" 
+            placeholder="Enter your email"
+            className="bg-white"
+          />
+        </div>
+
+        <div className="space-y-2 text-left">
+          <label className="text-sm font-medium">Password</label>
+          <Input 
+            type="password" 
+            placeholder="Enter your password"
+            className="bg-white"
+          />
+        </div>
+
+        <Button className="w-full">Sign Up</Button>
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-zinc-100 px-2 text-zinc-500">Or continue with</span>
+          </div>
+        </div>
+
+        <Button variant="outline" className="w-full bg-white">
           Sign up with Google
         </Button>
 
-        <div className="text-center text-sm">
-          <Link href="/auth/login" className="text-gray-500 hover:text-gray-900">
-            Already have an account? Login
+        <p className="text-center text-sm text-zinc-600">
+          Already have an account?{" "}
+          <Link href="/auth/login" className="font-medium text-zinc-900 hover:underline">
+            Login
           </Link>
-        </div>
+        </p>
       </div>
     </div>
   )
