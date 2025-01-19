@@ -17,6 +17,16 @@ import { toast } from "sonner"
 import Image from 'next/image'
 import type { List } from "@/types"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import ListCard from '@/components/list-card'
 
 export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -24,6 +34,9 @@ export default function ShowsPage() {
   const [publicLists, setPublicLists] = useState<List[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [newListName, setNewListName] = useState('')
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   const fetchLists = useCallback(async () => {
     if (!user) {
@@ -45,9 +58,13 @@ export default function ShowsPage() {
       console.log("Successfully fetched public lists:", public_lists);
       setPublicLists(public_lists || []); // Ensure we always set an array
       
-    } catch (error: Error) {
+    } catch (error: unknown) {
       console.error("Error fetching lists:", error);
-      toast.error(error.message || "Failed to fetch lists");
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to fetch lists");
+      } else {
+        toast.error("Failed to fetch lists");
+      }
     }
   }, [user]);
 
@@ -111,6 +128,38 @@ export default function ShowsPage() {
     </div>
   );
 
+  const handleCreateList = async () => {
+    if (!user) {
+      toast.error("Please log in to create a list");
+      return;
+    }
+
+    if (!newListName.trim()) {
+      toast.error("Please enter a list name");
+      return;
+    }
+
+    try {
+      await listsService.createList(user.uid, newListName, isPrivate);
+      toast.success("List created successfully!");
+      setIsOpen(false);
+      setNewListName('');
+      setIsPrivate(false);
+      
+      // Refresh user lists
+      const updated_lists = await listsService.getUserLists(user.uid);
+      setLists(updated_lists);
+      
+    } catch (error: unknown) {
+      console.error("Error creating list:", error);
+      if (error instanceof Error) {
+        toast.error(error.message || "Failed to create list");
+      } else {
+        toast.error("Failed to create list");
+      }
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -120,20 +169,37 @@ export default function ShowsPage() {
             Create and manage your personalized movie and TV show collections.
           </p>
         </div>
-        <Button 
-          variant="default" 
-          onClick={() => setDialogOpen(true)}
-          disabled={!user}
-        >
-          Add new list
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button>Create New List</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New List</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">List Name</Label>
+                <Input
+                  id="name"
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                  placeholder="Enter list name"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="private"
+                  checked={isPrivate}
+                  onCheckedChange={setIsPrivate}
+                />
+                <Label htmlFor="private">Private List</Label>
+              </div>
+              <Button onClick={handleCreateList}>Create List</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      <CreateListDialog 
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onListCreated={fetchLists}
-      />
 
       {!user ? (
         <div className="text-center py-8 text-muted-foreground">
