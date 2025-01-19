@@ -342,8 +342,8 @@ export default function DashboardPage() {
                     <div key={movie.id} className="w-[280px] flex-none">
                       <div className="bg-gray-50 rounded-lg p-4 h-full">
                         <div className="flex flex-col gap-4">
-                          {/* Image container with fixed aspect ratio */}
-                          <div className="relative w-full aspect-[2/3]"> {/* This ensures consistent aspect ratio */}
+                          {/* Image container */}
+                          <div className="relative w-full aspect-[2/3]">
                             <img
                               src={movie.Poster !== 'N/A' ? movie.Poster : '/images/placeholder.jpg'}
                               alt={movie.Title}
@@ -351,18 +351,19 @@ export default function DashboardPage() {
                             />
                           </div>
                           
-                          <div className="space-y-2">
-                            <h3 className="text-lg font-bold leading-tight line-clamp-2">{movie.Title}</h3>
-                            <p className="text-sm text-gray-600 line-clamp-3">{movie.Plot}</p>
+                          {/* Content container with proper wrapping */}
+                          <div className="space-y-2 whitespace-normal"> {/* Added whitespace-normal */}
+                            <h3 className="font-bold text-lg leading-tight line-clamp-1">{movie.Title}</h3>
+                            <p className="text-sm text-gray-600 line-clamp-2 leading-snug">{movie.Plot}</p>
                             
-                            <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div className="grid grid-cols-2 gap-2">
                               <div className="bg-white p-2 rounded">
-                                <div className="text-xs text-gray-600">IMDB</div>
+                                <div className="text-xs text-gray-600 truncate">IMDB</div>
                                 <div className="font-bold text-sm">{movie.imdbRating}/10</div>
                               </div>
                               {movie.Ratings?.find(r => r.Source === "Rotten Tomatoes") && (
                                 <div className="bg-white p-2 rounded">
-                                  <div className="text-xs text-gray-600">Rotten Tomatoes</div>
+                                  <div className="text-xs text-gray-600 truncate">Rotten Tomatoes</div>
                                   <div className="font-bold text-sm">
                                     {movie.Ratings.find(r => r.Source === "Rotten Tomatoes")?.Value}
                                   </div>
@@ -371,7 +372,9 @@ export default function DashboardPage() {
                             </div>
 
                             {movie.Awards && movie.Awards !== 'N/A' && (
-                              <p className="text-xs text-gray-500 italic mt-2">{movie.Awards}</p>
+                              <p className="text-xs text-gray-500 italic break-words">
+                                {movie.Awards}
+                              </p>
                             )}
                           </div>
                         </div>
