@@ -11,7 +11,7 @@ export default function AuthLayout({
       <div className="w-full max-w-md space-y-6 text-center">
         {/* Logo Image */}
         <div className="mb-8">
-          <Image 
+          <img 
             src="/assets/images/goodflicks.png" 
             alt="Goodflicks Logo" 
             width={192}  // 48 * 4 for the w-48 equivalent
