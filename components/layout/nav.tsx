@@ -13,7 +13,7 @@ const navItems = [
   },
   {
     title: 'My Library',
-    href: '/flick/gilmore-girls',
+    href: '/show/107',
     icon: Library
   },
   {

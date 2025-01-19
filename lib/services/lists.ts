@@ -11,6 +11,8 @@ import {
   increment,
   orderBy,
   Timestamp,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import type { List } from "@/types";
 
@@ -22,6 +24,14 @@ interface ListItem {
   addedAt: Date;
   posterPath?: string;
   title?: string;
+}
+
+interface MediaItem {
+  id: string;
+  type: 'movie' | 'show';
+  title: string;
+  posterPath?: string;
+  addedAt: Date;
 }
 
 export const listsService = {
@@ -98,50 +108,29 @@ export const listsService = {
   },
 
   // Add an item to a list
-  async addItemToList(
-    listId: string, 
-    itemId: string, 
-    type: 'movie' | 'show',
-    posterPath?: string,
-    title?: string
-  ): Promise<void> {
-    const newItem: Omit<ListItem, 'id'> = {
-      listId,
-      itemId,
-      type,
-      addedAt: new Date(),
-      posterPath,
-      title,
-    };
-    
-    // Add item to list-items collection
-    await addDoc(collection(db, "list-items"), newItem);
-    
-    // Update count and lastUpdated in the list document
+  async addItemToList(listId: string, item: MediaItem): Promise<void> {
     const listRef = doc(db, "lists", listId);
+    
     await updateDoc(listRef, {
-      [`${type}Count`]: increment(1),
+      items: arrayUnion({
+        ...item,
+        addedAt: new Date()
+      }),
+      [`${item.type}Count`]: increment(1),
       lastUpdated: new Date()
     });
   },
 
   // Remove an item from a list
   async removeItemFromList(listId: string, itemId: string, type: 'movie' | 'show'): Promise<void> {
-    // Find and delete the list-item
-    const q = query(
-      collection(db, "list-items"),
-      where("listId", "==", listId),
-      where("itemId", "==", itemId)
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const itemDoc = querySnapshot.docs[0];
-    if (itemDoc) {
-      await deleteDoc(doc(db, "list-items", itemDoc.id));
-      
-      // Update count and lastUpdated in the list document
-      const listRef = doc(db, "lists", listId);
+    const listRef = doc(db, "lists", listId);
+    const list = await getDocs(query(collection(db, "lists"), where("id", "==", listId)));
+    const items = list.docs[0].data().items || [];
+    const itemToRemove = items.find((i: MediaItem) => i.id === itemId);
+
+    if (itemToRemove) {
       await updateDoc(listRef, {
+        items: arrayRemove(itemToRemove),
         [`${type}Count`]: increment(-1),
         lastUpdated: new Date()
       });
@@ -188,5 +177,22 @@ export const listsService = {
       isPrivate,
       lastUpdated: new Date()
     });
+  },
+
+  async getListsContainingItem(itemId: string): Promise<List[]> {
+    const listsRef = collection(db, "lists");
+    const q = query(listsRef, where("items", "array-contains", { id: itemId }));
+    const snapshot = await getDocs(q);
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      userId: doc.data().userId,
+      movieCount: doc.data().movieCount || 0,
+      showCount: doc.data().showCount || 0,
+      isPrivate: doc.data().isPrivate ?? true,
+      createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
+      lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
+    }));
   }
 }; 

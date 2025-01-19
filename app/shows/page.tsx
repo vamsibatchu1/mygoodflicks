@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import Image from 'next/image'
 import type { List } from "@/types"
+import Link from "next/link"
 
 export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();

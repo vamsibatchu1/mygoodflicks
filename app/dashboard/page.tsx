@@ -14,6 +14,7 @@ import {
   SlidersHorizontal 
 } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 const streamingServices = [
   { name: "Netflix", logo: "/assets/images/logos/netflix.png" },

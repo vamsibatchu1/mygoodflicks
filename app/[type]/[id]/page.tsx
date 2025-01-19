@@ -7,13 +7,18 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, BookmarkPlus, MoreVertical, Users } from "lucide-react";
+import { Star, BookmarkPlus, MoreVertical, Users, Heart } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AddToListButton } from "./components/add-to-list-button";
+import { useAuth } from "@/hooks/useAuth";
+import { listsService } from "@/lib/services/lists";
+import { toast } from "sonner";
+import type { List } from "@/types";
 
 const reviewsData = [
   {
@@ -47,6 +52,8 @@ export default function ShowPage() {
   const [show, setShow] = useState<Show | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [lists, setLists] = useState<List[]>([]);
 
   useEffect(() => {
     const fetchShowData = async () => {
@@ -71,6 +78,57 @@ export default function ShowPage() {
       fetchShowData();
     }
   }, [params.id]);
+
+  useEffect(() => {
+    console.log("Page rendered with params:", params);
+  }, [params]);
+
+  useEffect(() => {
+    const fetchLists = async () => {
+      if (!user) return;
+      try {
+        const userLists = await listsService.getUserLists(user.uid);
+        setLists(userLists);
+      } catch (error) {
+        console.error("Error fetching lists:", error);
+        toast.error("Failed to load your lists");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLists();
+  }, [user]);
+
+  const handleAddToList = async (listId: string) => {
+    if (!user) return;
+    try {
+      await listsService.addItemToList(listId, {
+        id: params.id,
+        type: params.type as 'movie' | 'show',
+        title: show?.title || show?.name || '',
+        posterPath: show?.imageUrl,
+        addedAt: new Date()
+      });
+      
+      // Update the local lists state to reflect the new count
+      setLists(prevLists => prevLists.map(list => {
+        if (list.id === listId) {
+          return {
+            ...list,
+            [`${params.type}Count`]: (list[`${params.type}Count`] || 0) + 1,
+            lastUpdated: new Date()
+          };
+        }
+        return list;
+      }));
+      
+      toast.success("Added to list");
+    } catch (error) {
+      console.error("Error adding to list:", error);
+      toast.error("Failed to add to list");
+    }
+  };
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
@@ -116,9 +174,29 @@ export default function ShowPage() {
                   <Button variant="outline" size="icon">
                     <Star className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="icon">
-                    <BookmarkPlus className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="icon">
+                        <BookmarkPlus className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {loading ? (
+                        <DropdownMenuItem disabled>Loading lists...</DropdownMenuItem>
+                      ) : lists.length === 0 ? (
+                        <DropdownMenuItem disabled>No lists found</DropdownMenuItem>
+                      ) : (
+                        lists.map((list) => (
+                          <DropdownMenuItem
+                            key={list.id}
+                            onClick={() => handleAddToList(list.id)}
+                          >
+                            {list.name}
+                          </DropdownMenuItem>
+                        ))
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="icon">
@@ -196,6 +274,21 @@ export default function ShowPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon">
+          <Heart className="h-6 w-6" />
+        </Button>
+        <AddToListButton 
+          mediaId={params.id}
+          mediaType={params.type as 'movie' | 'show'}
+          title={show?.title || show?.name || ''}
+          posterPath={show?.imageUrl}
+        />
+        <Button variant="ghost" size="icon">
+          <MoreVertical className="h-6 w-6" />
+        </Button>
       </div>
     </div>
   );
