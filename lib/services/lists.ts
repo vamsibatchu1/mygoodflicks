@@ -2,25 +2,24 @@
 // List management functions
 // Real-time updates
 
-
-import { db, auth } from "@/lib/firebase";
+import { db, auth } from '@/lib/firebase'
 import { 
   collection, 
   addDoc, 
   query, 
   where, 
-  getDocs,
-  updateDoc,
+  getDocs, 
+  doc, 
+  updateDoc, 
   deleteDoc,
-  doc,
   increment,
   orderBy,
   Timestamp,
-  arrayUnion,
+  arrayUnion, 
   arrayRemove,
-  getDoc
-} from "firebase/firestore";
-import type { List } from "@/types";
+  getDoc,
+  DocumentData
+} from 'firebase/firestore'
 
 export interface MediaItem {
   id: string;
@@ -52,14 +51,14 @@ interface ListItem {
 export const listsService = {
   // Create a new list
   async createList(userId: string, name: string, isPrivate: boolean): Promise<string> {
-    const docRef = await addDoc(collection(db, "lists"), {
+    const docRef = await addDoc(collection(db, 'lists'), {
       userId,
       name,
       isPrivate,
       items: [],
       createdAt: Timestamp.now()
-    });
-    return docRef.id;
+    })
+    return docRef.id
   },
 
   // Get all lists for a user
@@ -69,45 +68,48 @@ export const listsService = {
       where('userId', '==', userId)
     )
     const querySnapshot = await getDocs(q)
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data() as DocumentData
+      return {
+        id: doc.id,
+        name: data.name,
+        userId: data.userId,
+        isPrivate: data.isPrivate,
+        items: data.items || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+      }
+    })
   },
 
   // Get public lists
   async getPublicLists(): Promise<List[]> {
     const q = query(
-      collection(db, "lists"),
-      where("isPrivate", "==", false)
-    );
-    
-    const querySnapshot = await getDocs(q);
-    const lists = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      userId: doc.data().userId,
-      movieCount: doc.data().movieCount || 0,
-      showCount: doc.data().showCount || 0,
-      isPrivate: false,
-      createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
-      lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
-    }));
-    
-    return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      collection(db, 'lists'),
+      where('isPrivate', '==', false)
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data() as DocumentData
+      return {
+        id: doc.id,
+        name: data.name,
+        userId: data.userId,
+        isPrivate: data.isPrivate,
+        items: data.items || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+      }
+    })
   },
 
   // Add an item to a list
   async addItemToList(listId: string, item: Omit<MediaItem, 'addedAt'>): Promise<void> {
-    const listRef = doc(db, "lists", listId);
-    
+    const listRef = doc(db, 'lists', listId)
     await updateDoc(listRef, {
       items: arrayUnion({
         ...item,
         addedAt: Timestamp.now()
-      }),
-      lastUpdated: Timestamp.now()
-    });
+      })
+    })
   },
 
   // Remove an item from a list
@@ -169,30 +171,35 @@ export const listsService = {
 
   async getListsContainingItem(itemId: string): Promise<List[]> {
     const q = query(
-      collection(db, "lists"),
-      where("items", "array-contains", { id: itemId })
-    );
-    const querySnapshot = await getDocs(q);
-    
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      userId: doc.data().userId,
-      movieCount: doc.data().movieCount || 0,
-      showCount: doc.data().showCount || 0,
-      isPrivate: doc.data().isPrivate ?? true,
-      createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
-      lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
-    }));
+      collection(db, 'lists'),
+      where('items', 'array-contains', { id: itemId })
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data() as DocumentData
+      return {
+        id: doc.id,
+        name: data.name,
+        userId: data.userId,
+        isPrivate: data.isPrivate,
+        items: data.items || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+      }
+    })
   },
 
-  async getList(listId: string) {
+  async getList(listId: string): Promise<List | null> {
     const docRef = doc(db, 'lists', listId)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
+      const data = docSnap.data() as DocumentData
       return {
         id: docSnap.id,
-        ...docSnap.data()
+        name: data.name,
+        userId: data.userId,
+        isPrivate: data.isPrivate,
+        items: data.items || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
       }
     }
     return null

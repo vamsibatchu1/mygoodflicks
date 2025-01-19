@@ -31,13 +31,22 @@ export interface Show {
   lastUpdated: string;
 }
 
+export interface MediaItem {
+  id: string;
+  type: 'movie' | 'show';
+  title: string;
+  posterPath?: string;
+  addedAt: Date;
+}
+
 export interface List {
   id: string;
   name: string;
   userId: string;
-  movieCount: number;
-  showCount: number;
   isPrivate: boolean;
+  items: MediaItem[];
   createdAt: Date;
-  lastUpdated: Date | null;
+  movieCount?: number;
+  showCount?: number;
+  lastUpdated?: Date;
 }

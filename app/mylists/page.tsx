@@ -5,7 +5,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/lib/auth";
 import { listsService } from "@/lib/services/lists";
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -30,7 +30,7 @@ import ListCard from '@/components/list-card'
 
 export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();
-  const [lists, setLists] = useState<List[]>([]);
+  const [userLists, setUserLists] = useState<List[]>([]);
   const [publicLists, setPublicLists] = useState<List[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +41,8 @@ export default function ShowsPage() {
   const fetchLists = useCallback(async () => {
     if (!user) {
       console.log("No user found, clearing lists");
-      setLists([]);
+      setUserLists([]);
+      setPublicLists([]);
       return;
     }
 
@@ -49,14 +50,28 @@ export default function ShowsPage() {
       console.log("Current user ID:", user.uid);
       console.log("Starting to fetch user lists...");
       
-      const userLists = await listsService.getUserLists(user.uid);
-      console.log("Successfully fetched user lists:", userLists);
-      setLists(userLists || []); // Ensure we always set an array
+      const fetchedLists = await listsService.getUserLists(user.uid);
+      const listsWithCounts = fetchedLists.map(list => ({
+        ...list,
+        movieCount: list.items.filter(item => item.type === 'movie').length,
+        showCount: list.items.filter(item => item.type === 'show').length,
+        lastUpdated: list.items.length > 0 
+          ? new Date(Math.max(...list.items.map(item => item.addedAt.getTime())))
+          : list.createdAt
+      }));
+      setUserLists(listsWithCounts);
 
       console.log("Starting to fetch public lists...");
       const public_lists = await listsService.getPublicLists();
-      console.log("Successfully fetched public lists:", public_lists);
-      setPublicLists(public_lists || []); // Ensure we always set an array
+      const publicListsWithCounts = public_lists.map(list => ({
+        ...list,
+        movieCount: list.items.filter(item => item.type === 'movie').length,
+        showCount: list.items.filter(item => item.type === 'show').length,
+        lastUpdated: list.items.length > 0 
+          ? new Date(Math.max(...list.items.map(item => item.addedAt.getTime())))
+          : list.createdAt
+      }));
+      setPublicLists(publicListsWithCounts);
       
     } catch (error: unknown) {
       console.error("Error fetching lists:", error);
@@ -148,7 +163,7 @@ export default function ShowsPage() {
       
       // Refresh user lists
       const updated_lists = await listsService.getUserLists(user.uid);
-      setLists(updated_lists);
+      setUserLists(updated_lists);
       
     } catch (error: unknown) {
       console.error("Error creating list:", error);
@@ -208,7 +223,7 @@ export default function ShowsPage() {
       ) : (
         <Tabs defaultValue="created" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="created">Created by you ({lists.length})</TabsTrigger>
+            <TabsTrigger value="created">Created by you ({userLists.length})</TabsTrigger>
             <TabsTrigger value="following">Following</TabsTrigger>
             <TabsTrigger value="popular">Popular ({publicLists.length})</TabsTrigger>
           </TabsList>
@@ -224,12 +239,12 @@ export default function ShowsPage() {
           </div>
 
           <TabsContent value="created" className="space-y-4">
-            {lists.length === 0 ? (
+            {userLists.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No lists created yet. Create your first list!
               </div>
             ) : (
-              <ListGrid items={filteredLists(lists)} />
+              <ListGrid items={filteredLists(userLists)} />
             )}
           </TabsContent>
 

@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server'
 
-const OMDB_API_KEY = '7c57da65'
+export const dynamic = 'force-dynamic' // Mark this route as dynamic
 
-export async function GET(request: Request) {
+export async function GET() {
+  const apiKey = process.env.OMDB_API_KEY
+  const testUrl = `http://www.omdbapi.com/?apikey=${apiKey}&t=inception`
+
   try {
-    const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title') || 'Inception'
-    
-    const response = await fetch(
-      `http://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${title}`
-    )
-    
+    const response = await fetch(testUrl)
     const data = await response.json()
-    console.log('OMDB Response:', data)
-
     return NextResponse.json(data)
   } catch (error) {
     console.error('OMDB API Error:', error)
-    return NextResponse.json({ error: 'Failed to fetch movie data' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch from OMDB' }, { status: 500 })
   }
 } 
