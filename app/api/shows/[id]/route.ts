@@ -50,7 +50,7 @@ export async function GET(
         networkScore: data.imdbRating === 'N/A' ? 0 : parseFloat(data.imdbRating),
         allTimeScore: data.Metascore === 'N/A' ? 0 : parseInt(data.Metascore),
         imdbVotes: data.imdbVotes === 'N/A' ? 0 : parseInt(data.imdbVotes.replace(/,/g, '')),
-        rottenTomatoes: "N/A"
+        rottenTomatoes: data.Ratings?.find(r => r.Source === "Rotten Tomatoes")?.Value?.replace('%', '') || "0"
       }
     }
 
