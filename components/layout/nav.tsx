@@ -22,7 +22,7 @@ const navItems = [
     icon: Activity
   },
   {
-    title: 'Shows',
+    title: 'My Lists',
     href: '/shows',
     icon: Film
   },
