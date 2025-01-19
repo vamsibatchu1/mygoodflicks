@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { MediaItem } from '@/lib/services/lists'
 
 interface MediaDetailsProps {
   id: string;
@@ -62,12 +63,13 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
 
   const handleAddToList = async (listId: string) => {
     try {
-      await listsService.addItemToList(listId, {
+      const mediaItem: Omit<MediaItem, 'addedAt'> = {
         id: id.toString(),
         type: show?.Type?.toLowerCase() as 'movie' | 'show',
         title: show?.Title || '',
         posterPath: show?.Poster,
-      })
+      }
+      await listsService.addItemToList(listId, mediaItem)
       toast.success('Added to list!')
     } catch (error) {
       console.error('Error adding to list:', error)
@@ -90,7 +92,7 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
         <Card>
           <CardContent className="p-4">
             <img
-              src={show.Poster !== 'N/A' ? show.Poster : '/placeholder.png'}
+              src={show.Poster !== 'N/A' ? show.Poster : '/images/placeholder.jpg'}
               alt={show.Title}
               className="w-full rounded-lg shadow-lg"
             />

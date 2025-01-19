@@ -12,7 +12,7 @@ export default function AuthLayout({
         {/* Logo Image */}
         <div className="mb-8">
           <Image 
-            src="/assets/images/goodflicks-logo.png" 
+            src="/assets/images/goodflicks.png" 
             alt="Goodflicks Logo" 
             width={192}  // 48 * 4 for the w-48 equivalent
             height={100}  // Adjust based on your logo's aspect ratio

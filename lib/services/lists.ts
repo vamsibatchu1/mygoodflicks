@@ -22,6 +22,23 @@ import {
 } from "firebase/firestore";
 import type { List } from "@/types";
 
+export interface MediaItem {
+  id: string;
+  type: 'movie' | 'show';
+  title: string;
+  posterPath?: string;
+  addedAt: Date;
+}
+
+export interface List {
+  id: string;
+  name: string;
+  userId: string;
+  isPrivate: boolean;
+  items: MediaItem[];
+  createdAt: Date;
+}
+
 interface ListItem {
   id?: string;
   listId: string;
@@ -32,29 +49,16 @@ interface ListItem {
   title?: string;
 }
 
-interface MediaItem {
-  id: string;
-  type: 'movie' | 'show';
-  title: string;
-  posterPath?: string;
-  addedAt: Date;
-}
-
 export const listsService = {
   // Create a new list
   async createList(userId: string, name: string, isPrivate: boolean): Promise<string> {
-    const newList: Omit<List, 'id'> = {
-      name,
+    const docRef = await addDoc(collection(db, "lists"), {
       userId,
-      movieCount: 0,
-      showCount: 0,
-      createdAt: Timestamp.now(),
-      lastUpdated: Timestamp.now(),
+      name,
       isPrivate,
       items: [],
-    };
-    
-    const docRef = await addDoc(collection(db, "lists"), newList);
+      createdAt: Timestamp.now()
+    });
     return docRef.id;
   },
 
@@ -94,7 +98,7 @@ export const listsService = {
   },
 
   // Add an item to a list
-  async addItemToList(listId: string, item: MediaItem): Promise<void> {
+  async addItemToList(listId: string, item: Omit<MediaItem, 'addedAt'>): Promise<void> {
     const listRef = doc(db, "lists", listId);
     
     await updateDoc(listRef, {
@@ -102,7 +106,6 @@ export const listsService = {
         ...item,
         addedAt: Timestamp.now()
       }),
-      [`${item.type}Count`]: increment(1),
       lastUpdated: Timestamp.now()
     });
   },
@@ -117,7 +120,6 @@ export const listsService = {
     if (itemToRemove) {
       await updateDoc(listRef, {
         items: arrayRemove(itemToRemove),
-        [`${type}Count`]: increment(-1),
         lastUpdated: Timestamp.now()
       });
     }
