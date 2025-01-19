@@ -86,85 +86,51 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
   }
 
   return (
-    <div className="grid md:grid-cols-3 gap-8">
-      {/* Poster Column */}
-      <div className="md:col-span-1">
-        <Card>
-          <CardContent className="p-4">
-            <img
-              src={show.Poster !== 'N/A' ? show.Poster : '/images/placeholder.jpg'}
-              alt={show.Title}
-              className="w-full rounded-lg shadow-lg"
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Details Column */}
-      <div className="md:col-span-2 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{show.Title}</h1>
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Badge variant="secondary">{show.Year}</Badge>
-            <Badge variant="secondary">{show.Rated}</Badge>
-            <Badge variant="secondary">{show.Runtime}</Badge>
-            {show.Genre?.split(', ').map((genre: string) => (
-              <Badge key={genre} variant="outline">
-                {genre}
-              </Badge>
-            ))}
-          </div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Poster Column */}
+        <div className="md:col-span-1">
+          <img
+            src={show?.Poster !== 'N/A' ? show?.Poster : '/images/placeholder.jpg'}
+            alt={show?.Title}
+            className="w-full rounded-lg shadow-lg"
+          />
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Plot</h2>
-            <p className="text-gray-700">{show.Plot}</p>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Details</h2>
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <dt className="font-medium text-gray-500">Director</dt>
-                <dd>{show.Director}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">Writers</dt>
-                <dd>{show.Writer}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">Actors</dt>
-                <dd>{show.Actors}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-gray-500">Awards</dt>
-                <dd>{show.Awards}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Ratings</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {show.Ratings?.map((rating: any) => (
-                <div key={rating.Source} className="bg-gray-50 p-4 rounded-lg">
-                  <dt className="font-medium text-gray-500">{rating.Source}</dt>
-                  <dd className="text-2xl font-bold">{rating.Value}</dd>
-                </div>
-              ))}
+        {/* Details Column */}
+        <div className="md:col-span-2 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold">{show?.Title}</h1>
+            <div className="flex flex-wrap gap-2">
+              <Badge>{show?.Type}</Badge>
+              <Badge variant="secondary">{show?.Year}</Badge>
             </div>
           </div>
 
+          {/* Rating and Genre */}
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+            {show?.imdbRating && (
+              <span className="flex items-center gap-1">
+                ⭐ {show.imdbRating}
+              </span>
+            )}
+            {show?.Runtime && <span>{show.Runtime}</span>}
+            {show?.Genre && <span>{show.Genre}</span>}
+          </div>
+
+          {/* Plot */}
+          <p className="text-gray-700">{show?.Plot}</p>
+
+          {/* Add to List Section */}
           {user && (
-            <div className="pt-4">
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">Add to List</h2>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Select
                   value={selectedList}
                   onValueChange={setSelectedList}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Select a list" />
                   </SelectTrigger>
                   <SelectContent>
@@ -178,6 +144,7 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
                 <Button
                   onClick={() => selectedList && handleAddToList(selectedList)}
                   disabled={!selectedList}
+                  className="w-full sm:w-auto"
                 >
                   Add to List
                 </Button>

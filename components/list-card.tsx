@@ -23,17 +23,17 @@ export default function ListCard({ list }: ListCardProps) {
 
   return (
     <Link href={`/lists/${list.id}`}>
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="h-full hover:shadow-lg transition-shadow">
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-xl">{list.name}</CardTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <CardTitle className="text-lg sm:text-xl">{list.name}</CardTitle>
             {list.isPrivate && (
-              <Badge variant="secondary">Private</Badge>
+              <Badge variant="secondary" className="w-fit">Private</Badge>
             )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div className="space-y-2">
               <p className="text-sm text-gray-500">
                 {itemCount} {itemCount === 1 ? 'item' : 'items'}
@@ -52,7 +52,7 @@ export default function ListCard({ list }: ListCardProps) {
               )}
             </div>
             {list.items && list.items.length > 0 && list.items[0].posterPath && (
-              <div className="w-16 h-24 relative overflow-hidden rounded">
+              <div className="w-16 h-24 relative overflow-hidden rounded shrink-0">
                 <img
                   src={list.items[0].posterPath}
                   alt={list.items[0].title}

@@ -176,14 +176,9 @@ export default function ShowsPage() {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-2xl font-bold">My lists</h1>
-          <p className="text-muted-foreground">
-            Create and manage your personalized movie and TV show collections.
-          </p>
-        </div>
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">My Lists</h1>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button>Create New List</Button>
@@ -216,55 +211,27 @@ export default function ShowsPage() {
         </Dialog>
       </div>
 
-      {!user ? (
-        <div className="text-center py-8 text-muted-foreground">
-          Please sign in to create and manage lists
-        </div>
-      ) : (
-        <Tabs defaultValue="created" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="created">Created by you ({userLists.length})</TabsTrigger>
-            <TabsTrigger value="following">Following</TabsTrigger>
-            <TabsTrigger value="popular">Popular ({publicLists.length})</TabsTrigger>
-          </TabsList>
-
-          <div className="relative">
-            <Input
-              type="search"
-              placeholder="Search lists..."
-              className="max-w-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <TabsContent value="created" className="space-y-4">
-            {userLists.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No lists created yet. Create your first list!
-              </div>
-            ) : (
-              <ListGrid items={filteredLists(userLists)} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="popular" className="space-y-4">
-            {publicLists.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No public lists available.
-              </div>
-            ) : (
-              <ListGrid items={filteredLists(publicLists)} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="following" className="space-y-4">
-            <div className="text-center text-muted-foreground py-8">
-              Following feature coming soon!
+      {user && (
+        <div className="space-y-8">
+          <section>
+            <h2 className="text-xl font-semibold mb-4">Your Lists</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {userLists.map((list) => (
+                <ListCard key={list.id} list={list} />
+              ))}
             </div>
-          </TabsContent>
-        </Tabs>
+          </section>
+        </div>
       )}
+
+      <section>
+        <h2 className="text-xl font-semibold mb-4">Public Lists</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {publicLists.map((list) => (
+            <ListCard key={list.id} list={list} />
+          ))}
+        </div>
+      </section>
     </div>
   )
 } 

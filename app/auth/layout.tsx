@@ -10,11 +10,11 @@ export default function AuthLayout({
     <div className="flex min-h-screen flex-col items-center justify-center p-6">
       <div className="w-full max-w-md space-y-6 text-center">
         {/* Logo Image */}
-        <div className="mb-8">
+        <div className="mb-0">
           <img 
-            src="/assets/images/goodflicks.png" 
+            src="/assets/images/logos/goodflicks.png" 
             alt="Goodflicks Logo" 
-            width={192}  // 48 * 4 for the w-48 equivalent
+            width={240}  // 48 * 4 for the w-48 equivalent
             height={100}  // Adjust based on your logo's aspect ratio
             className="mx-auto"
           />
