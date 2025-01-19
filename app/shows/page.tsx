@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { listsService } from "@/lib/services/lists";
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { Users, Lock, Globe } from "lucide-react"
 import { CreateListDialog } from "./components/create-list-dialog"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import Image from 'next/image'
 
 interface List {
   id: string;
@@ -26,19 +27,16 @@ export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();
   const [lists, setLists] = useState<List[]>([]);
   const [publicLists, setPublicLists] = useState<List[]>([]);
-  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchLists = async () => {
+  const fetchLists = useCallback(async () => {
     if (!user) {
       console.log("No user found, clearing lists");
       setLists([]);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
       console.log("Current user ID:", user.uid);
       console.log("Starting to fetch user lists...");
@@ -53,42 +51,19 @@ export default function ShowsPage() {
       setPublicLists(public_lists || []); // Ensure we always set an array
       
     } catch (error: any) {
-      console.error("Detailed fetch error:", {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
+      console.error("Error fetching lists:", error as Error);
       toast.error(error.message || "Failed to fetch lists");
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
-    // Only fetch lists after auth is initialized
-    if (!authLoading) {
-      console.log("Auth state loaded, fetching lists...");
-      fetchLists();
-    }
-  }, [user, authLoading]);
+    fetchLists();
+  }, [user, fetchLists]);
 
   // Add loading state for auth
   if (authLoading) {
     return <div className="text-center py-8">Loading...</div>;
   }
-
-  const handleCreateList = async (name: string, isPrivate: boolean) => {
-    if (!user) return;
-    
-    try {
-      await listsService.createList(user.uid, name, isPrivate);
-      // Refresh lists
-      const userLists = await listsService.getUserLists(user.uid);
-      setLists(userLists);
-    } catch (error) {
-      console.error("Error creating list:", error);
-    }
-  };
 
   const filteredLists = (listArray: List[]) => {
     return listArray.filter(list => 
@@ -102,14 +77,18 @@ export default function ShowsPage() {
         <Card key={list.id} className="p-4">
           <div className="aspect-[2/1] relative mb-4">
             <div className="grid grid-cols-2 gap-1 h-full">
-              <img
+              <Image
                 src="/placeholder.jpg"
                 alt="List cover"
+                width={200}
+                height={100}
                 className="w-full h-full object-cover rounded-l-md"
               />
-              <img
+              <Image
                 src="/placeholder.jpg"
                 alt="List cover"
+                width={200}
+                height={100}
                 className="w-full h-full object-cover rounded-r-md"
               />
             </div>

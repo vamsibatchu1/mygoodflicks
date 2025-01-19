@@ -10,7 +10,6 @@ import {
   doc,
   increment,
   orderBy,
-  Timestamp
 } from "firebase/firestore";
 
 interface List {

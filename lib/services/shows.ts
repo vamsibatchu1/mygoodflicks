@@ -1,5 +1,5 @@
 import { db } from '../firebase';
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import openai from '../openai';
 import { Show } from '@/types';
 
