@@ -6,6 +6,12 @@ import { NextResponse } from "next/server"
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 
+// Add this type at the top of the file
+type Rating = {
+  Source: string;
+  Value: string;
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -50,7 +56,7 @@ export async function GET(
         networkScore: data.imdbRating === 'N/A' ? 0 : parseFloat(data.imdbRating),
         allTimeScore: data.Metascore === 'N/A' ? 0 : parseInt(data.Metascore),
         imdbVotes: data.imdbVotes === 'N/A' ? 0 : parseInt(data.imdbVotes.replace(/,/g, '')),
-        rottenTomatoes: data.Ratings?.find(r => r.Source === "Rotten Tomatoes")?.Value?.replace('%', '') || "0"
+        rottenTomatoes: data.Ratings?.find((r: Rating) => r.Source === "Rotten Tomatoes")?.Value?.replace('%', '') || "0"
       }
     }
 
