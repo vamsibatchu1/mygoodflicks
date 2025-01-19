@@ -293,26 +293,26 @@ export default function DashboardPage() {
                       ))}
                     </div>
                   </div>
-
-                  <div>
-                    <h3 className="mb-3 text-base font-medium flex items-center gap-2">
-                      <SlidersHorizontal className="w-5 h-5" />
-                      Other filters
-                    </h3>
-                    <div className="space-y-2">
-                      {[
-                        "Top picks from my friends",
-                        "Staff picks",
-                        "Family-friendly",
-                        "Binge-worthy series"
-                      ].map((filter) => (
-                        <div key={filter} className="flex items-center justify-between">
-                          <span>{filter}</span>
-                          <Switch />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  
+                 {/* <div> 
+  <h3 className="mb-3 text-base font-medium flex items-center gap-2">
+    <SlidersHorizontal className="w-5 h-5" />
+    Other filters
+  </h3>
+  <div className="space-y-2">
+    {[
+      "Top picks from my friends",
+      "Staff picks",
+      "Family-friendly",
+      "Binge-worthy series"
+    ].map((filter) => (
+      <div key={filter} className="flex items-center justify-between">
+        <span>{filter}</span>
+        <Switch />
+      </div>
+    ))}
+  </div>
+</div> */}
 
                   <Button 
                     className="w-full" 
