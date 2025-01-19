@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
+import { signOut } from 'next-auth/react'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -11,11 +12,19 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 
-export function Navbar() {
-  const { user, signOut } = useAuth()
+interface NavbarProps {
+  className?: string
+}
+
+export function Navbar({ className }: NavbarProps) {
+  const { user } = useAuth()
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/' })
+  }
 
   return (
-    <nav className="border-b bg-background">
+    <nav className={`border-b bg-background ${className || ''}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
@@ -52,11 +61,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-4">
             {user ? (
-              <>
-                <Button variant="ghost" onClick={() => signOut()}>
-                  Sign Out
-                </Button>
-              </>
+              <Button onClick={handleSignOut}>Sign Out</Button>
             ) : (
               <Link href="/auth">
                 <Button>Sign In</Button>

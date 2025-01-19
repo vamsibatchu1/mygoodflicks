@@ -40,6 +40,9 @@ type MediaResult = {
   Type: string;
   imdbRating: string;
   Plot: string;
+  id: string;
+  Ratings?: { Source: string; Value: string }[];
+  Awards?: string;
 }
 
 export default function DashboardPage() {
@@ -329,7 +332,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Here are your 5 recommendations</h2>
             <div className="space-y-4">
               {results.map((show) => (
-                <div key={show.imdbID} className="bg-gray-100 rounded-lg p-4 flex gap-4">
+                <div key={show.id} className="bg-gray-100 rounded-lg p-4 flex gap-4">
                   <div className="w-24 flex-shrink-0">
                     <img
                       src={show.Poster !== 'N/A' ? show.Poster : '/images/placeholder.jpg'}
@@ -343,13 +346,30 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 line-clamp-2">{show.Plot}</p>
                     
                     <div className="grid grid-cols-2 gap-3">
-                      {show.imdbRating && (
-                        <div>
-                          <div className="text-xs text-gray-600">IMDB</div>
-                          <div className="font-bold text-sm">{show.imdbRating}</div>
-                        </div>
-                      )}
+                      {show.Ratings?.map((rating) => {
+                        if (rating.Source === "Rotten Tomatoes") {
+                          return (
+                            <div key={rating.Source}>
+                              <div className="text-xs text-gray-600">Rotten Tomatoes</div>
+                              <div className="font-bold text-sm">{rating.Value}</div>
+                            </div>
+                          )
+                        }
+                        if (rating.Source === "Internet Movie Database") {
+                          return (
+                            <div key={rating.Source}>
+                              <div className="text-xs text-gray-600">IMDB</div>
+                              <div className="font-bold text-sm">{rating.Value}</div>
+                            </div>
+                          )
+                        }
+                        return null
+                      })}
                     </div>
+
+                    {show.Awards && show.Awards !== 'N/A' && (
+                      <p className="text-xs text-gray-600">{show.Awards}</p>
+                    )}
                   </div>
                 </div>
               ))}
