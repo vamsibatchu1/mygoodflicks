@@ -27,3 +27,14 @@ export interface Show {
   }[];
   lastUpdated: string;
 }
+
+export interface List {
+  id: string;
+  name: string;
+  userId: string;
+  movieCount: number;
+  showCount: number;
+  isPrivate: boolean;
+  createdAt: Date;
+  lastUpdated: Date | null;
+}

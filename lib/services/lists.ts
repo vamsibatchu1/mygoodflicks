@@ -10,18 +10,9 @@ import {
   doc,
   increment,
   orderBy,
+  Timestamp,
 } from "firebase/firestore";
-
-interface List {
-  id?: string;
-  name: string;
-  userId: string;
-  movieCount: number;
-  showCount: number;
-  createdAt: Date;
-  isPrivate: boolean;
-  lastUpdated?: Date;
-}
+import type { List } from "@/types";
 
 interface ListItem {
   id?: string;
@@ -53,31 +44,24 @@ export const listsService = {
   // Get all lists for a user
   async getUserLists(userId: string): Promise<List[]> {
     try {
-      console.log("getUserLists called with userId:", userId);
-      
       const listsRef = collection(db, "lists");
-      // Simplified query without ordering until index is ready
       const q = query(
         listsRef,
         where("userId", "==", userId)
       );
       
       const querySnapshot = await getDocs(q);
-      const lists = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name,
-          userId: data.userId,
-          movieCount: data.movieCount || 0,
-          showCount: data.showCount || 0,
-          isPrivate: data.isPrivate ?? true,
-          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
-          lastUpdated: data.lastUpdated ? new Date(data.lastUpdated.seconds * 1000) : null,
-        } as List;
-      });
+      const lists = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        userId: doc.data().userId,
+        movieCount: doc.data().movieCount || 0,
+        showCount: doc.data().showCount || 0,
+        isPrivate: doc.data().isPrivate ?? true,
+        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
+        lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
+      }));
       
-      // Sort in memory temporarily
       return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } catch (error) {
       console.error("Error in getUserLists:", error);
@@ -89,28 +73,23 @@ export const listsService = {
   async getPublicLists(): Promise<List[]> {
     try {
       const listsRef = collection(db, "lists");
-      // Simplified query without ordering until index is ready
       const q = query(
         listsRef,
         where("isPrivate", "==", false)
       );
       
       const querySnapshot = await getDocs(q);
-      const lists = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          name: data.name,
-          userId: data.userId,
-          movieCount: data.movieCount || 0,
-          showCount: data.showCount || 0,
-          isPrivate: false,
-          createdAt: data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date(),
-          lastUpdated: data.lastUpdated ? new Date(data.lastUpdated.seconds * 1000) : null,
-        } as List;
-      });
+      const lists = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        userId: doc.data().userId,
+        movieCount: doc.data().movieCount || 0,
+        showCount: doc.data().showCount || 0,
+        isPrivate: false,
+        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
+        lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
+      }));
       
-      // Sort in memory temporarily
       return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } catch (error) {
       console.error("Error in getPublicLists:", error);

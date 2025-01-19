@@ -11,17 +11,7 @@ import { CreateListDialog } from "./components/create-list-dialog"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import Image from 'next/image'
-
-interface List {
-  id: string;
-  name: string;
-  userId: string;
-  movieCount: number;
-  showCount: number;
-  isPrivate: boolean;
-  createdAt: Date;
-  lastUpdated?: Date | null;
-}
+import type { List } from "@/types"
 
 export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();
