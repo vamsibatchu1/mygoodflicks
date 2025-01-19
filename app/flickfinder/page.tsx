@@ -15,7 +15,9 @@ import {
   Star, 
   Calendar, 
   Tv2, 
-  SlidersHorizontal 
+  SlidersHorizontal,
+  Plus,
+  MoreVertical
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -46,6 +48,8 @@ type MediaResult = {
   }[];
   Awards: string;
   id: string;
+  wins?: number;
+  nominations?: number;
 }
 
 export default function DashboardPage() {
@@ -89,7 +93,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-2 sm:px-0 py-8 sm:py-12">
+    <div className="container mx-auto px-2 sm:px-0 py-4 sm:py-6">
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
         {/* Form Section - Now with flex-shrink-0 */}
         <div className="flex-shrink-0 lg:max-w-2xl w-full">
@@ -329,9 +333,9 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Recommendations Section - Now with sticky positioning */}
+        {/* Recommendations Section - Increased width */}
         {results.length > 0 && (
-          <div className="mt-8 lg:mt-0 lg:sticky lg:top-4 lg:w-[400px] lg:flex-shrink-0">
+          <div className="mt-8 lg:mt-0 lg:w-[600px] lg:flex-shrink-0">
             <h2 className="text-2xl font-bold mb-4">Here are your {results.length} recommendations</h2>
             
             {/* Mobile View (Horizontal Scroll) */}
@@ -389,49 +393,58 @@ export default function DashboardPage() {
             {/* Desktop View */}
             <div className="hidden lg:flex lg:flex-col lg:space-y-4">
               {results.map((movie) => (
-                <div key={movie.id} className="bg-gray-50 rounded-lg p-4">
+                <div key={movie.id} className="bg-gray-50 rounded-lg p-6 w-full">
                   <div className="flex gap-4">
-                    {/* Poster Image */}
-                    <img
-                      src={movie.Poster !== 'N/A' ? movie.Poster : '/images/placeholder.jpg'}
-                      alt={movie.Title}
-                      className="w-20 h-28 object-cover rounded-md flex-shrink-0"
-                    />
-                    
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      {/* Title */}
-                      <h3 className="font-bold text-lg">{movie.Title}</h3>
-                      
-                      {/* Description */}
-                      <p className="text-sm text-gray-600 line-clamp-2 mt-1">{movie.Plot}</p>
-                      
-                      {/* Ratings */}
-                      <div className="mt-2 space-y-1">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">IMDB</span>
-                          <span className="text-sm font-medium">{movie.imdbRating}/10</span>
+                    {/* Left side - Image */}
+                    <div className="w-[120px] h-[180px] flex-shrink-0">
+                      <img
+                        src={movie.Poster !== 'N/A' ? movie.Poster : '/images/placeholder.jpg'}
+                        alt={movie.Title}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+
+                    {/* Middle - Content */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-4">
+                        <h2 className="text-xl font-bold">{movie.Title}</h2>
+                        {/* Right - Action Buttons */}
+                        <div className="flex gap-2">
+                          <button className="p-2 rounded-full hover:bg-gray-100">
+                            <Star className="h-5 w-5" />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-gray-100">
+                            <Plus className="h-5 w-5" />
+                          </button>
+                          <button className="p-2 rounded-full hover:bg-gray-100">
+                            <MoreVertical className="h-5 w-5" />
+                          </button>
                         </div>
-                        
-                        {movie.Ratings?.map((rating) => {
-                          if (rating.Source === "Rotten Tomatoes") {
-                            return (
-                              <div key="rt" className="flex justify-between items-center">
-                                <span className="text-xs text-gray-600">Rotten Tomatoes</span>
-                                <span className="text-sm font-medium">{rating.Value}</span>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
                       </div>
 
-                      {/* Awards/Nominations */}
-                      {movie.Awards && movie.Awards !== 'N/A' && (
-                        <p className="text-xs text-gray-500 italic mt-2">
-                          {movie.Awards}
-                        </p>
-                      )}
+                      <p className="text-gray-700 text-base line-clamp-2 mb-4">{movie.Plot}</p>
+
+                      {/* Ratings */}
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="text-sm font-medium">IMDB</span>
+                          <span className="ml-auto text-sm">{movie.imdbRating}/10</span>
+                        </div>
+                        {movie.Ratings?.find(r => r.Source === "Rotten Tomatoes") && (
+                          <div className="flex items-center">
+                            <span className="text-sm font-medium">Rotten Tomatoes</span>
+                            <span className="ml-auto text-sm">
+                              {movie.Ratings.find(r => r.Source === "Rotten Tomatoes")?.Value}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Awards */}
+                      <div className="text-sm text-gray-500 italic mt-3">
+                        {movie.Awards && movie.Awards !== 'N/A' ? movie.Awards : 
+                         `${movie.wins || 0} wins & ${movie.nominations || 0} nominations total`}
+                      </div>
                     </div>
                   </div>
                 </div>
