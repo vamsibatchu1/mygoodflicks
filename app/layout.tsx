@@ -1,6 +1,6 @@
 // Root layout with providers
 // Includes AuthProvider, Toaster
-// Sets up basic HTML structure and metadata
+// Sets up basic HTML structure and metadataa
 
 
 import type { Metadata } from "next"
