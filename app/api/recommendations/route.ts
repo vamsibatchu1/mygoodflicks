@@ -16,7 +16,8 @@ export async function POST(request: Request) {
     - Rating preference: ${body.ratingPreference}
     - Release time preference: ${body.releaseTime}
     
-    Please provide only the titles, separated by commas.`
+    Return ONLY the titles separated by commas, without numbers or periods.
+    Example format: "The Godfather, Lawrence of Arabia, Gladiator, Braveheart, Saving Private Ryan"`
     
     console.log('OpenAI prompt:', prompt)
 
@@ -25,39 +26,50 @@ export async function POST(request: Request) {
       model: "gpt-3.5-turbo",
     })
 
-    // Add null check and provide default empty string
     const content = completion.choices[0]?.message?.content || ''
+    
+    // Split by commas and clean each title
     const titles = content
       .split(',')
       .map(title => title
-        .replace(/^\d+\.\s*/, '') // Remove leading numbers
-        .replace(/\n/g, '') // Remove newlines
-        .trim() // Remove extra spaces
+        .replace(/^\d+\.\s*/, '') // Remove any leading numbers
+        .replace(/\s+/g, ' ') // Normalize spaces
+        .trim()
       )
       .filter(title => title.length > 0)
 
-    console.log('Cleaned titles:', titles)
+    console.log('Parsed titles:', titles)
 
+    // Fetch each movie separately
     const mediaDetails = await Promise.all(
       titles.map(async (title) => {
-        const url = `http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${process.env.OMDB_API_KEY}`
-        console.log('OMDB request URL:', url)
-        const response = await fetch(url)
-        const data = await response.json()
-        console.log('OMDB response for', title, ':', data)
-        return data
+        try {
+          const url = `http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${process.env.OMDB_API_KEY}`
+          console.log('Fetching:', url)
+          const response = await fetch(url)
+          const data = await response.json()
+          console.log('OMDB response for', title, ':', data)
+          return data
+        } catch (error) {
+          console.error('Error fetching movie:', title, error)
+          return null
+        }
       })
     )
 
-    // Filter out any failed responses
-    const validResults = mediaDetails.filter(item => item.Response !== 'False')
+    // Filter out failed responses and null values
+    const validResults = mediaDetails.filter(item => item && item.Response === 'True')
+    console.log('Valid results:', validResults.length)
 
     return NextResponse.json(validResults)
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Detailed API Error:', error)
     return NextResponse.json(
-      { error: 'Failed to get recommendations', details: error.message },
+      { 
+        error: 'Failed to get recommendations', 
+        details: error?.message || 'Unknown error'
+      },
       { status: 500 }
     )
   }
