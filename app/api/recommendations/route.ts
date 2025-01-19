@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     - Rating preference: ${body.ratingPreference}
     - Release time preference: ${body.releaseTime}
     
-    Please provide exactly 5 titles, separated by commas only, with no numbers or new lines.`
+    Please provide only the titles, separated by commas.`
     
     console.log('OpenAI prompt:', prompt)
 
@@ -25,15 +25,16 @@ export async function POST(request: Request) {
       model: "gpt-3.5-turbo",
     })
 
-    // Clean up the response: remove numbers, newlines, and extra spaces
-    const titles = completion.choices[0].message.content
+    // Add null check and provide default empty string
+    const content = completion.choices[0]?.message?.content || ''
+    const titles = content
       .split(',')
       .map(title => title
         .replace(/^\d+\.\s*/, '') // Remove leading numbers
         .replace(/\n/g, '') // Remove newlines
         .trim() // Remove extra spaces
       )
-      .filter(title => title.length > 0) // Remove empty titles
+      .filter(title => title.length > 0)
 
     console.log('Cleaned titles:', titles)
 
