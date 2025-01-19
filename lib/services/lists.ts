@@ -3,7 +3,7 @@
 // Real-time updates
 
 
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { 
   collection, 
   addDoc, 
@@ -18,6 +18,7 @@ import {
   Timestamp,
   arrayUnion,
   arrayRemove,
+  getDoc
 } from "firebase/firestore";
 import type { List } from "@/types";
 
@@ -47,9 +48,10 @@ export const listsService = {
       userId,
       movieCount: 0,
       showCount: 0,
-      createdAt: new Date(),
-      lastUpdated: new Date(),
+      createdAt: Timestamp.now(),
+      lastUpdated: Timestamp.now(),
       isPrivate,
+      items: [],
     };
     
     const docRef = await addDoc(collection(db, "lists"), newList);
@@ -58,58 +60,37 @@ export const listsService = {
 
   // Get all lists for a user
   async getUserLists(userId: string): Promise<List[]> {
-    try {
-      const listsRef = collection(db, "lists");
-      const q = query(
-        listsRef,
-        where("userId", "==", userId)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const lists = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        userId: doc.data().userId,
-        movieCount: doc.data().movieCount || 0,
-        showCount: doc.data().showCount || 0,
-        isPrivate: doc.data().isPrivate ?? true,
-        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
-        lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
-      }));
-      
-      return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    } catch (error) {
-      console.error("Error in getUserLists:", error);
-      throw error;
-    }
+    const q = query(
+      collection(db, 'lists'),
+      where('userId', '==', userId)
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
   },
 
   // Get public lists
   async getPublicLists(): Promise<List[]> {
-    try {
-      const listsRef = collection(db, "lists");
-      const q = query(
-        listsRef,
-        where("isPrivate", "==", false)
-      );
-      
-      const querySnapshot = await getDocs(q);
-      const lists = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        userId: doc.data().userId,
-        movieCount: doc.data().movieCount || 0,
-        showCount: doc.data().showCount || 0,
-        isPrivate: false,
-        createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
-        lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
-      }));
-      
-      return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    } catch (error) {
-      console.error("Error in getPublicLists:", error);
-      throw error;
-    }
+    const q = query(
+      collection(db, "lists"),
+      where("isPrivate", "==", false)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const lists = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      userId: doc.data().userId,
+      movieCount: doc.data().movieCount || 0,
+      showCount: doc.data().showCount || 0,
+      isPrivate: false,
+      createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
+      lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
+    }));
+    
+    return lists.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   },
 
   // Add an item to a list
@@ -119,10 +100,10 @@ export const listsService = {
     await updateDoc(listRef, {
       items: arrayUnion({
         ...item,
-        addedAt: new Date()
+        addedAt: Timestamp.now()
       }),
       [`${item.type}Count`]: increment(1),
-      lastUpdated: new Date()
+      lastUpdated: Timestamp.now()
     });
   },
 
@@ -137,7 +118,7 @@ export const listsService = {
       await updateDoc(listRef, {
         items: arrayRemove(itemToRemove),
         [`${type}Count`]: increment(-1),
-        lastUpdated: new Date()
+        lastUpdated: Timestamp.now()
       });
     }
   },
@@ -180,16 +161,18 @@ export const listsService = {
     const listRef = doc(db, "lists", listId);
     await updateDoc(listRef, {
       isPrivate,
-      lastUpdated: new Date()
+      lastUpdated: Timestamp.now()
     });
   },
 
   async getListsContainingItem(itemId: string): Promise<List[]> {
-    const listsRef = collection(db, "lists");
-    const q = query(listsRef, where("items", "array-contains", { id: itemId }));
-    const snapshot = await getDocs(q);
+    const q = query(
+      collection(db, "lists"),
+      where("items", "array-contains", { id: itemId })
+    );
+    const querySnapshot = await getDocs(q);
     
-    return snapshot.docs.map(doc => ({
+    return querySnapshot.docs.map(doc => ({
       id: doc.id,
       name: doc.data().name,
       userId: doc.data().userId,
@@ -199,5 +182,17 @@ export const listsService = {
       createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date(),
       lastUpdated: doc.data().lastUpdated ? new Date(doc.data().lastUpdated.seconds * 1000) : null,
     }));
+  },
+
+  async getList(listId: string) {
+    const docRef = doc(db, 'lists', listId)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data()
+      }
+    }
+    return null
   }
 }; 

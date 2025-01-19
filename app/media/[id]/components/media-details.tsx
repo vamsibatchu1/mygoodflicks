@@ -49,7 +49,7 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
     const fetchLists = async () => {
       if (user) {
         try {
-          const userLists = await listsService.getListsForUser()
+          const userLists = await listsService.getUserLists(user.uid)
           setLists(userLists)
         } catch (error) {
           console.error('Error fetching lists:', error)
