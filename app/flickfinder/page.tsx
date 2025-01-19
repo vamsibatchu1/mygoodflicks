@@ -86,7 +86,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-6 sm:px-8 py-8 sm:py-12">
+    <div className="container mx-auto px-2 sm:px-8 py-8 sm:py-12">
       <div className="flex gap-12">
         <div className="flex-1">
           <main className="flex-1 p-1">

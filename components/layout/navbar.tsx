@@ -28,9 +28,11 @@ export function Navbar({ className }: NavbarProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              GoodFlicks
-            </Link>
+          <img
+            src="/assets/images/logos/wordmark.png" // Add your wordmark image here
+            alt="GoodFlicks"
+            className="h-6 w-auto" // Adjust size as needed
+          />
           </div>
 
           <NavigationMenu>
