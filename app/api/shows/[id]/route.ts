@@ -2,7 +2,7 @@
 // Media data fetching
 // Error handling
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from "next/server"
 import { db } from '@/lib/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 

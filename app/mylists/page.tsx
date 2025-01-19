@@ -45,8 +45,8 @@ export default function ShowsPage() {
       console.log("Successfully fetched public lists:", public_lists);
       setPublicLists(public_lists || []); // Ensure we always set an array
       
-    } catch (error: any) {
-      console.error("Error fetching lists:", error as Error);
+    } catch (error: Error) {
+      console.error("Error fetching lists:", error);
       toast.error(error.message || "Failed to fetch lists");
     }
   }, [user]);
