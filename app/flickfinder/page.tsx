@@ -89,15 +89,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-2 sm:px-8 py-8 sm:py-12">
+    <div className="container mx-auto px-2 sm:px-0 py-8 sm:py-12">
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
         {/* Form Section - Now with flex-shrink-0 */}
         <div className="flex-shrink-0 lg:max-w-2xl w-full">
           <Card>
             <CardContent className="p-6 space-y-6"> 
               <h1 className="text-2xl font-bold mb-6">Flick Finder: Your Personal Movie DJ</h1>           
-              <div className="space-y-16 sm:space-y-6">
-                <div className="flex flex-col min-h-[120px] sm:min-h-fit mb-8 sm:mb-0">
+              <div className="space-y-16 sm:space-y-4">
+                <div className="flex flex-col min-h-fit sm:min-h-fit mb-8 sm:mb-0">
                   <h2 className="text-base font-medium flex items-center gap-2">
                     <Popcorn className="w-5 h-5" />
                     What are you in the mood for?
@@ -156,7 +156,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col min-h-[120px] sm:min-h-fit mb-8 sm:mb-0">
+                <div className="flex flex-col min-h-fit sm:min-h-fit mb-8 sm:mb-0">
                   <h2 className="text-base font-medium flex items-center gap-2">
                     <Clock className="w-5 h-5" />
                     How much time do you have for watching?
@@ -196,7 +196,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col min-h-[120px] sm:min-h-fit mb-8 sm:mb-0">
+                <div className="flex flex-col min-h-fit sm:min-h-fit mb-8 sm:mb-0">
                   <h2 className="text-base font-medium flex items-center gap-2">
                     <Star className="w-5 h-5" />
                     What&apos;s your rating choice like?
@@ -236,7 +236,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col min-h-[120px] sm:min-h-fit mb-8 sm:mb-0">
+                <div className="flex flex-col min-h-fit sm:min-h-fit mb-8 sm:mb-0">
                   <h2 className="text-base font-medium flex items-center gap-2">
                     <Calendar className="w-5 h-5" />
                     Release time
