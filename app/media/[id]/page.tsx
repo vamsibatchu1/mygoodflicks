@@ -51,8 +51,13 @@ const reviewsData = [
   },
 ];
 
-export default function ShowPage() {
-  const params = useParams();
+interface PageProps {
+  params: {
+    id: string;  // Specify that id is a string
+  };
+}
+
+export default async function MediaPage({ params }: PageProps) {
   const [show, setShow] = useState<Show | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,14 +111,12 @@ export default function ShowPage() {
   }, [user]);
 
   const handleAddToList = async (listId: string) => {
-    if (!user) return;
     try {
       await listsService.addItemToList(listId, {
-        id: params.id,
+        id: params.id.toString(), // Convert to string if needed
         type: show?.Type?.toLowerCase() as 'movie' | 'show',
         title: show?.title || show?.name || '',
         posterPath: show?.imageUrl,
-        addedAt: new Date()
       });
       
       // Update the local lists state to reflect the new count
