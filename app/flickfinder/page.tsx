@@ -39,6 +39,7 @@ type MediaResult = {
   Type: string;
   imdbRating: string;
   Plot: string;
+  imdbID: string;  // Add this line
 }
 
 export default function DashboardPage() {
