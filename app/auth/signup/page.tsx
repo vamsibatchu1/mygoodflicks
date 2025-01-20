@@ -22,22 +22,36 @@ export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setIsLoading(true)
     
     try {
+      console.log('Attempting signup with:', email)
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      if (userCredential.user) {
-        toast.success("Account created successfully!")
+      console.log('Signup successful:', userCredential.user.email)
+      
+      // First show the toast
+      toast.success("Account created successfully!")
+      
+      // Then redirect immediately without waiting for toast
+      setTimeout(() => {
         router.push('/flickfinder')
-      }
+      }, 3000) // Short delay to allow toast to show
+      
     } catch (error: any) {
-      console.error('Signup error:', error)
-      setError(error.message || "Failed to create account")
-      toast.error("Failed to create account. Please try again.")
+      console.error('Signup error:', error.code, error.message)
+      const errorMessage = error.code === 'auth/email-already-in-use'
+        ? "Email already exists"
+        : "Failed to create account. Please try again."
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -57,7 +71,6 @@ export default function SignupPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -76,7 +89,7 @@ export default function SignupPage() {
               {error && <div className="text-red-500 text-sm">{error}</div>}
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button className="w-full" type="submit">
+              <Button className="w-full" type="submit" disabled={isLoading}>
                 Sign Up
               </Button>
               <div className="text-sm text-center text-gray-500">

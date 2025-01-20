@@ -14,14 +14,12 @@ export function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // If user is not logged in and trying to access protected routes
+      // Only redirect from protected routes if not logged in
       if (!user && !isAuthPage) {
         router.push('/auth/login')
       }
-      // If user is logged in and trying to access auth pages
-      if (user && isAuthPage) {
-        router.push('/flickfinder')
-      }
+      // Remove the automatic redirect when logged in user tries to access auth pages
+      // This allows users to stay on login/signup pages if they choose to
     })
 
     return () => unsubscribe()

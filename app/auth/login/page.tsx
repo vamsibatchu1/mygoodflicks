@@ -26,28 +26,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setIsLoading(true)
     
     try {
+      console.log('Attempting login with:', email)
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      if (userCredential.user) {
-        toast.success("Successfully logged in!")
+      console.log('Login successful:', userCredential.user.email)
+      
+      // Show toast and redirect
+      toast.success("Login successful. Welcome back to GoodFlicks!")
+      
+      setTimeout(() => {
         router.push('/flickfinder')
-      }
+      }, 1000)
+      
     } catch (error: any) {
-      console.error('Login error:', error)
-      setError(error.message || "Failed to login")
-      toast.error("Failed to login. Please check your credentials.")
+      console.error('Login error:', error.code, error.message)
+      const errorMessage = error.code === 'auth/invalid-credential' 
+        ? "Invalid email or password"
+        : "Failed to login. Please try again."
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-      <div className="w-full max-w-md space-y-8">
-  
+    <div className="w-full max-w-md space-y-8">
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">Sign in</CardTitle>
@@ -65,6 +77,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="grid gap-2">
@@ -75,13 +88,14 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
               {error && <div className="text-red-500 text-sm">{error}</div>}
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button className="w-full" type="submit">
-                Sign In
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
               <div className="text-sm text-center text-gray-500">
                 Don&apos;t have an account?{" "}
