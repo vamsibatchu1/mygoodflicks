@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { listsService } from '@/lib/services/lists'
 import { auth } from '@/lib/firebase'
+import { WaveLoading } from '@/components/animations'
 
 const streamingServices = [
   { name: "Netflix", logo: "/assets/images/logos/netflix.png" },
@@ -389,7 +390,12 @@ export default function DashboardPage() {
                   onClick={handleGetRecommendations}
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Finding the perfect shows...' : 'Show me my shows now'}
+                  {isLoading ? (
+                    <div className="flex justify-center items-center min-h-[20px]">
+                      Fetching shows &nbsp;&nbsp;
+                      <WaveLoading color="#fff" size="sm" />
+                    </div>
+                  ) : 'Show me my shows now'}
                 </Button>
               </div>
             </CardContent>
@@ -489,12 +495,13 @@ export default function DashboardPage() {
                             <DropdownMenuContent 
                               align="end" 
                               className="w-48"
+                              onOpenChange={(open) => {
+                                if (open) {
+                                  handleDropdownOpen()
+                                }
+                              }}
                             >
-                              {isLoadingLists ? (
-                                <DropdownMenuItem disabled>
-                                  Loading lists...
-                                </DropdownMenuItem>
-                              ) : lists.length > 0 ? (
+                              {lists.length > 0 ? (
                                 lists.map((list) => (
                                   <DropdownMenuItem
                                     key={list.id}
