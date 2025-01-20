@@ -17,7 +17,7 @@ export default function WelcomePage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-12 md:p-24 justify-center md:justify-center bg-black text-white p-4">
+    <div className="min-h-screen flex flex-col items-center pt-20 p-12 md:p-24 justify-start md:justify-center bg-black text-white p-4">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -59,7 +59,7 @@ export default function WelcomePage() {
             <img 
               src="/assets/images/logos/white-wordmark.png" 
               alt="GoodFlicks"
-              className="h-8 md:h-12 w-auto mb-4 md:mb-8 ml-0 md:ml-5"
+              className="h-8 md:h-12 w-auto mb-4 md:mb-8 ml-0 md:ml-5 mt-16"
             />
             <Button 
               size="lg"
