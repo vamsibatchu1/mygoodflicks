@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 
-export default function LoginPage() {
+export default function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -97,12 +97,6 @@ export default function LoginPage() {
               <Button className="w-full" type="submit" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
-              <div className="text-sm text-center text-gray-500">
-                Don&apos;t have an account?{" "}
-                <Link href="/auth/signup" className="text-blue-500 hover:underline">
-                  Sign up
-                </Link>
-              </div>
             </CardFooter>
           </form>
         </Card>

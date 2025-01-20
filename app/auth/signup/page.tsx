@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 
-export default function SignupPage() {
+export default function SignUpForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -92,12 +92,6 @@ export default function SignupPage() {
               <Button className="w-full" type="submit" disabled={isLoading}>
                 Sign Up
               </Button>
-              <div className="text-sm text-center text-gray-500">
-                Already have an account?{" "}
-                <Link href="/auth/login" className="text-blue-500 hover:underline">
-                  Login
-                </Link>
-              </div>
             </CardFooter>
           </form>
         </Card>

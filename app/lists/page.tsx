@@ -50,7 +50,7 @@ export default function ListsPage() {
       if (user) {
         setUserId(user.uid)
       } else {
-        router.push('/auth/login')
+        router.push('/auth')
       }
     })
 

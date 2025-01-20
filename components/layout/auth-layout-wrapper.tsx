@@ -10,13 +10,13 @@ import { useRouter } from 'next/navigation'
 export function AuthLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const isAuthPage = pathname?.startsWith('/auth/')
+  const isAuthPage = pathname === '/auth' || pathname?.startsWith('/auth/')
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       // Only redirect from protected routes if not logged in
       if (!user && !isAuthPage) {
-        router.push('/auth/login')
+        router.push('/auth')
       }
       // Remove the automatic redirect when logged in user tries to access auth pages
       // This allows users to stay on login/signup pages if they choose to

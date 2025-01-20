@@ -14,7 +14,7 @@ export default function SettingsPage() {
     try {
       await signOut(auth)
       toast.success('Logged out successfully')
-      router.push('/auth/login')
+      router.push('/auth')
     } catch (error) {
       toast.error('Failed to log out')
     }

@@ -7,7 +7,7 @@ import { Search } from 'lucide-react'
 
 export function NavWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const authPaths = ['/auth/login', '/auth/signup']
+  const authPaths = ['/auth', '/auth']
   const isAuthPage = authPaths.includes(pathname)
 
   if (isAuthPage) {
