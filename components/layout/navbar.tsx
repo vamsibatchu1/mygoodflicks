@@ -38,7 +38,7 @@ export function Navbar() {
 
         {/* Logo - centered on mobile, left-aligned on desktop */}
         <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
-          <Link href="/" className="text-xl font-bold">
+          <Link href="/flickfinder" className="text-xl font-bold">
           <img
             src="/assets/images/logos/nav-wordmark.png" // Add your wordmark image here
             alt="GoodFlicks"
