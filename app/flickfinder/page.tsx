@@ -492,10 +492,10 @@ export default function DashboardPage() {
                                 <Plus className="h-5 w-5" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent 
+                            <DropdownMenuContent
                               align="end" 
                               className="w-48"
-                              onOpenChange={(open) => {
+                              onPointerDownOutside={(open) => {
                                 if (open) {
                                   handleDropdownOpen()
                                 }
