@@ -17,14 +17,14 @@ export default function WelcomePage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen flex flex-col items-center pt-24 justify-start bg-black text-white p-4">
+    <div className="min-h-screen flex flex-col items-center p-12 md:p-24 justify-center md:justify-center bg-black text-white p-4">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="max-w-2xl text-left"
       >
         
-        <div className={`${typewriterFont.className} text-xl md:text-2xl mb-8 h-[300px]`}>
+        <div className={`${typewriterFont.className} text-lg md:text-2xl mb-8 h-[300px]`}>
           <Typewriter
             options={{
               delay: 50,
