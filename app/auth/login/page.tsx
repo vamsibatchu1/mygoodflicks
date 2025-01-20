@@ -62,7 +62,7 @@ export default function LoginPage() {
     <div className="w-full max-w-md space-y-8">
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Sign in</CardTitle>
+            <CardTitle className="text-2xl text-center">Login</CardTitle>
             <CardDescription className="text-center">
               Enter your email and password to login
             </CardDescription>

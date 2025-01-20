@@ -63,13 +63,14 @@ export default function MediaDetails({ id }: MediaDetailsProps) {
 
   const handleAddToList = async (listId: string) => {
     try {
-      const mediaItem: Omit<MediaItem, 'addedAt'> = {
-        id: id.toString(),
-        type: show?.Type?.toLowerCase() as 'movie' | 'show',
-        title: show?.Title || '',
-        posterPath: show?.Poster,
+      const mediaItem = {
+        mediaId: show?.imdbID,
+        mediaType: 'show',
+        mediaTitle: show?.Title,
+        mediaPoster: show?.Poster,
       }
-      await listsService.addItemToList(listId, mediaItem)
+      
+      await listsService.addToList(listId, mediaItem)
       toast.success('Added to list!')
     } catch (error) {
       console.error('Error adding to list:', error)

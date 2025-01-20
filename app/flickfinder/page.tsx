@@ -17,7 +17,8 @@ import {
   Tv2, 
   SlidersHorizontal,
   Plus,
-  MoreVertical
+  MoreVertical,
+  MoreHorizontal
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -25,6 +26,16 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { AddToListDropdown } from "@/components/lists/add-to-list-dropdown"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { listsService } from '@/lib/services/lists'
+import { auth } from '@/lib/firebase'
 
 const streamingServices = [
   { name: "Netflix", logo: "/assets/images/logos/netflix.png" },
@@ -35,21 +46,23 @@ const streamingServices = [
   { name: "Other", logo: "/assets/images/logos/disney.png" }, // No logo for "Other"
 ]
 
-// First, add this type for the media results
-type MediaResult = {
+interface MediaResult {
   Title: string;
-  Year: string;
+  imdbID: string;
+  Type: string;
   Poster: string;
-  Plot: string;
-  imdbRating: string;
-  Ratings: {
-    Source: string;
-    Value: string;
-  }[];
-  Awards: string;
-  id: string;
+  Plot?: string;
+  imdbRating?: string;
+  Ratings?: Array<{ Source: string; Value: string; }>;
+  Awards?: string;
+  favorite?: boolean;
   wins?: number;
   nominations?: number;
+}
+
+interface List {
+  id: string;
+  name: string;
 }
 
 export default function DashboardPage() {
@@ -57,8 +70,10 @@ export default function DashboardPage() {
   const [selectedTime, setSelectedTime] = React.useState<string>("")
   const [selectedRating, setSelectedRating] = React.useState<string>("")
   const [selectedRelease, setSelectedRelease] = React.useState<string>("")
-  const [results, setResults] = useState<MediaResult[]>([])
+  const [recommendations, setRecommendations] = useState<MediaResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [lists, setLists] = useState<List[]>([])
+  const [isLoadingLists, setIsLoadingLists] = useState(false)
 
   const handleGetRecommendations = async () => {
     setIsLoading(true)
@@ -83,12 +98,60 @@ export default function DashboardPage() {
       const data = await response.json()
       console.log('Received data:', data)
       
-      setResults(data)
+      setRecommendations(data)
     } catch (error) {
       console.error('Detailed error:', error)
       toast.error('Failed to get recommendations')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleAddToList = async (listId: string, movie: MediaResult, listName: string) => {
+    try {
+      if (!auth.currentUser) {
+        toast.error('Please sign in to add to lists')
+        return
+      }
+
+      await listsService.addToList(listId, {
+        mediaId: movie.imdbID,
+        mediaType: movie.Type?.toLowerCase() === 'series' ? 'show' : 'movie',
+        mediaTitle: movie.Title,
+        mediaPoster: movie.Poster
+      })
+      
+      toast.success(`Added "${movie.Title}" to ${listName}`)
+    } catch (error: any) {
+      console.error('Error adding to list:', error)
+      toast.error('Failed to add to list. Please try again.')
+    }
+  }
+
+  const handleDropdownOpen = async () => {
+    const user = auth.currentUser
+    if (!user) {
+      toast.error('Please sign in to add to lists')
+      return
+    }
+
+    try {
+      setIsLoadingLists(true)
+      const data = await listsService.getUserLists(user.uid)
+      
+      const filteredLists = data
+        .filter(item => item.name)
+        .map(list => ({
+          id: list.id,
+          name: list.name || 'Untitled List'
+        }))
+
+      setLists(filteredLists)
+    } catch (error) {
+      console.error('Error fetching lists:', error)
+      toast.error('Failed to load your lists')
+    } finally {
+      setIsLoadingLists(false)
     }
   }
 
@@ -334,16 +397,16 @@ export default function DashboardPage() {
         </div>
 
         {/* Recommendations Section - Increased width */}
-        {results.length > 0 && (
+        {recommendations.length > 0 && (
           <div className="mt-8 lg:mt-0 lg:w-[600px] lg:flex-shrink-0">
-            <h2 className="text-2xl font-bold mb-4">Here are your {results.length} recommendations</h2>
+            <h2 className="text-2xl font-bold mb-4">Here are your {recommendations.length} recommendations</h2>
             
             {/* Mobile View (Horizontal Scroll) */}
             <div className="lg:hidden">
               <ScrollArea className="w-full whitespace-nowrap">
                 <div className="flex w-max space-x-4 p-4">
-                  {results.map((movie) => (
-                    <div key={movie.id} className="w-[280px] flex-none">
+                  {recommendations.map((movie) => (
+                    <div key={movie.imdbID} className="w-[280px] flex-none">
                       <div className="bg-gray-50 rounded-lg p-4 h-full">
                         <div className="flex flex-col gap-4">
                           {/* Image container */}
@@ -392,8 +455,8 @@ export default function DashboardPage() {
 
             {/* Desktop View */}
             <div className="hidden lg:flex lg:flex-col lg:space-y-4">
-              {results.map((movie) => (
-                <div key={movie.id} className="bg-gray-50 rounded-lg p-6 w-full">
+              {recommendations.map((movie) => (
+                <div key={movie.imdbID} className="bg-gray-50 rounded-lg p-6 w-full">
                   <div className="flex gap-4">
                     {/* Left side - Image */}
                     <div className="w-[120px] h-[180px] flex-shrink-0">
@@ -411,13 +474,44 @@ export default function DashboardPage() {
                         {/* Right - Action Buttons */}
                         <div className="flex gap-2">
                           <button className="p-2 rounded-full hover:bg-gray-100">
-                            <Star className="h-5 w-5" />
+                            <Star className={`h-5 w-5 ${movie.favorite ? 'text-yellow-400 fill-yellow-400' : 'text-gray-400'}`} />
                           </button>
+                          <DropdownMenu onOpenChange={(open) => {
+                            if (open) {
+                              handleDropdownOpen()
+                            }
+                          }}>
+                            <DropdownMenuTrigger asChild>
+                              <button className="p-2 rounded-full hover:bg-gray-100">
+                                <Plus className="h-5 w-5" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent 
+                              align="end" 
+                              className="w-48"
+                            >
+                              {isLoadingLists ? (
+                                <DropdownMenuItem disabled>
+                                  Loading lists...
+                                </DropdownMenuItem>
+                              ) : lists.length > 0 ? (
+                                lists.map((list) => (
+                                  <DropdownMenuItem
+                                    key={list.id}
+                                    onClick={() => handleAddToList(list.id, movie, list.name)}
+                                  >
+                                    {list.name}
+                                  </DropdownMenuItem>
+                                ))
+                              ) : (
+                                <DropdownMenuItem disabled>
+                                  No lists found
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                           <button className="p-2 rounded-full hover:bg-gray-100">
-                            <Plus className="h-5 w-5" />
-                          </button>
-                          <button className="p-2 rounded-full hover:bg-gray-100">
-                            <MoreVertical className="h-5 w-5" />
+                            <MoreHorizontal className="h-5 w-5" />
                           </button>
                         </div>
                       </div>
@@ -443,7 +537,9 @@ export default function DashboardPage() {
                       {/* Awards */}
                       <div className="text-sm text-gray-500 italic mt-3">
                         {movie.Awards && movie.Awards !== 'N/A' ? movie.Awards : 
-                         `${movie.wins || 0} wins & ${movie.nominations || 0} nominations total`}
+                         movie.wins || movie.nominations ? 
+                         `${movie.wins || 0} wins & ${movie.nominations || 0} nominations total` :
+                         'No awards information available'}
                       </div>
                     </div>
                   </div>

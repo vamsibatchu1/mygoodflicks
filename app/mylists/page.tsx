@@ -15,7 +15,7 @@ import { CreateListDialog } from "./components/create-list-dialog"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import Image from 'next/image'
-import type { List } from "@/types"
+import type { List as ListType } from "@/types"
 import Link from "next/link"
 import {
   Dialog,
@@ -27,11 +27,26 @@ import {
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import ListCard from '@/components/list-card'
+import { auth } from "@/lib/firebase"
+import { Plus } from "lucide-react"
+
+interface UserList {
+  id: string
+  name: string
+  isPrivate: boolean
+  userId: string
+  items: any[]
+  createdAt: any
+  updatedAt?: any  // Add optional updatedAt field
+  movieCount: number
+  showCount: number
+  lastUpdated: any
+}
 
 export default function ShowsPage() {
   const { user, loading: authLoading } = useAuth();
-  const [userLists, setUserLists] = useState<List[]>([]);
-  const [publicLists, setPublicLists] = useState<List[]>([]);
+  const [userLists, setUserLists] = useState<UserList[]>([]);
+  const [publicLists, setPublicLists] = useState<UserList[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [newListName, setNewListName] = useState('')
@@ -51,25 +66,23 @@ export default function ShowsPage() {
       console.log("Starting to fetch user lists...");
       
       const fetchedLists = await listsService.getUserLists(user.uid);
-      const listsWithCounts = fetchedLists.map(list => ({
+      const transformedLists = fetchedLists.map(list => ({
         ...list,
-        movieCount: list.items.filter(item => item.type === 'movie').length,
-        showCount: list.items.filter(item => item.type === 'show').length,
-        lastUpdated: list.items.length > 0 
-          ? new Date(Math.max(...list.items.map(item => item.addedAt.getTime())))
-          : list.createdAt
+        movieCount: (list.items || []).filter(item => item.type === 'movie').length,
+        showCount: (list.items || []).filter(item => item.type === 'show').length,
+        isPrivate: list.isPrivate ?? true,
+        lastUpdated: list.createdAt
       }));
-      setUserLists(listsWithCounts);
+      setUserLists(transformedLists);
 
       console.log("Starting to fetch public lists...");
       const public_lists = await listsService.getPublicLists();
       const publicListsWithCounts = public_lists.map(list => ({
         ...list,
-        movieCount: list.items.filter(item => item.type === 'movie').length,
-        showCount: list.items.filter(item => item.type === 'show').length,
-        lastUpdated: list.items.length > 0 
-          ? new Date(Math.max(...list.items.map(item => item.addedAt.getTime())))
-          : list.createdAt
+        movieCount: (list.items || []).filter(item => item.type === 'movie').length,
+        showCount: (list.items || []).filter(item => item.type === 'show').length,
+        isPrivate: list.isPrivate ?? false,
+        lastUpdated: list.createdAt  // Just use createdAt for now
       }));
       setPublicLists(publicListsWithCounts);
       
@@ -92,13 +105,13 @@ export default function ShowsPage() {
     return <div className="text-center py-8">Loading...</div>;
   }
 
-  const filteredLists = (listArray: List[]) => {
+  const filteredLists = (listArray: UserList[]) => {
     return listArray.filter(list => 
       list.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   };
 
-  const ListGrid = ({ items }: { items: List[] }) => (
+  const ListGrid = ({ items }: { items: UserList[] }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {items.map((list) => (
         <Card key={list.id} className="p-4">
@@ -155,7 +168,10 @@ export default function ShowsPage() {
     }
 
     try {
-      await listsService.createList(user.uid, newListName, isPrivate);
+      await listsService.createList({
+        title: newListName,
+        isPublic: !isPrivate
+      });
       toast.success("List created successfully!");
       setIsOpen(false);
       setNewListName('');
@@ -163,7 +179,14 @@ export default function ShowsPage() {
       
       // Refresh user lists
       const updated_lists = await listsService.getUserLists(user.uid);
-      setUserLists(updated_lists);
+      const transformedLists = updated_lists.map(list => ({
+        ...list,
+        movieCount: (list.items || []).filter(item => item.type === 'movie').length,
+        showCount: (list.items || []).filter(item => item.type === 'show').length,
+        lastUpdated: list.createdAt,
+        isPrivate: list.isPrivate ?? true  // Provide default value
+      }));
+      setUserLists(transformedLists);
       
     } catch (error: unknown) {
       console.error("Error creating list:", error);
