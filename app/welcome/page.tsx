@@ -20,13 +20,13 @@ const SEQUENCE = [
   },
   { 
     text: "We have all been there. Endless recommendations from friends, reviews scattered across apps, and the overwhelming choice of what is trending. ",
-    audioFile: '/assets/sounds/type2.mov', // 7.63 seconds
+    audioFile: '/assets/sounds/type2.mp3', // 7.63 seconds
     duration: 7.63,
     pause: 500
   },
   { 
     text: "That is where Good Flicks comes in. We bring everything you need into one place - your friends' recommendations, trending titles, and personalized picks based on what you love. ",
-    audioFile: '/assets/sounds/type3.mov', // 10.3 seconds
+    audioFile: '/assets/sounds/type3.mp3', // 10.3 seconds
     duration: 10.3,
     pause: 500
   },
@@ -38,7 +38,7 @@ const SEQUENCE = [
   },
   { 
     text: "Because time is precious—and you deserve the perfect watch, every time.",
-    audioFile: '/assets/sounds/type5.mov', // 4.5 seconds
+    audioFile: '/assets/sounds/type5.mp3', // 4.5 seconds
     duration: 4.5,
     pause: 500
   }
