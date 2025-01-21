@@ -16,31 +16,31 @@ const SEQUENCE = [
     text: "Ever spent an hour scrolling, trying to decide what to watch, only to give up? ",
     audioFile: '/assets/sounds/type1.mp3', // 4.5 seconds
     duration: 4.5,
-    pause: 1000
+    pause: 500
   },
   { 
     text: "We have all been there. Endless recommendations from friends, reviews scattered across apps, and the overwhelming choice of what is trending. ",
     audioFile: '/assets/sounds/type2.mov', // 7.63 seconds
     duration: 7.63,
-    pause: 1000
+    pause: 500
   },
   { 
     text: "That is where Good Flicks comes in. We bring everything you need into one place - your friends' recommendations, trending titles, and personalized picks based on what you love. ",
     audioFile: '/assets/sounds/type3.mov', // 10.3 seconds
     duration: 10.3,
-    pause: 1000
+    pause: 500
   },
   { 
     text: "No more endless searching. Just great movies and shows, ready for you to enjoy. ",
     audioFile: '/assets/sounds/type4.mp3', // 5.41 seconds
     duration: 5.41,
-    pause: 1000
+    pause: 500
   },
   { 
     text: "Because time is precious—and you deserve the perfect watch, every time.",
     audioFile: '/assets/sounds/type5.mov', // 4.5 seconds
     duration: 4.5,
-    pause: 1000
+    pause: 500
   }
 ]
 
