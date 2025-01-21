@@ -1,129 +1,110 @@
 'use client'
 import { Special_Elite } from 'next/font/google'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Typewriter from 'typewriter-effect'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 
 const typewriterFont = Special_Elite({ 
-    weight: '400',
-    subsets: ['latin'] 
-  })
+  weight: '400',
+  subsets: ['latin'] 
+})
 
-// Shared timing configuration for both typing and audio
-const SEQUENCE_TIMING = [
+const SEQUENCE = [
   { 
     text: "Ever spent an hour scrolling, trying to decide what to watch, only to give up? ",
-    time: 4,
+    audioFile: '/assets/sounds/type1.mp3', // 4.5 seconds
+    duration: 4.5,
     pause: 1000
   },
   { 
     text: "We have all been there. Endless recommendations from friends, reviews scattered across apps, and the overwhelming choice of what is trending. ",
-    time: 12,
+    audioFile: '/assets/sounds/type2.mov', // 7.63 seconds
+    duration: 7.63,
     pause: 1000
   },
   { 
     text: "That is where Good Flicks comes in. We bring everything you need into one place - your friends' recommendations, trending titles, and personalized picks based on what you love. ",
-    time: 20.84,
+    audioFile: '/assets/sounds/type3.mov', // 10.3 seconds
+    duration: 10.3,
     pause: 1000
   },
   { 
     text: "No more endless searching. Just great movies and shows, ready for you to enjoy. ",
-    time: 18.45,
+    audioFile: '/assets/sounds/type4.mp3', // 5.41 seconds
+    duration: 5.41,
     pause: 1000
   },
   { 
     text: "Because time is precious—and you deserve the perfect watch, every time.",
-    time: 29.88,
+    audioFile: '/assets/sounds/type5.mov', // 4.5 seconds
+    duration: 4.5,
     pause: 1000
   }
 ]
 
-// For audio breaks
-const AUDIO_BREAKS = SEQUENCE_TIMING.map(({ time, pause }) => ({
-  time,
-  duration: pause
-}))
-
-// For typing sequence
-const TYPING_SEQUENCE = SEQUENCE_TIMING.map(({ text, pause }) => ({
-  text,
-  pause
-}))
-
 export default function WelcomePage() {
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [showTyping, setShowTyping] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
   const router = useRouter()
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
-  const [hasInteracted, setHasInteracted] = useState(false)
-  const [showTyping, setShowTyping] = useState(false)
 
-  useEffect(() => {
-    const typeSound = new Audio('/assets/sounds/type.mov')
-    typeSound.volume = 0.3
-    let isPaused = false  // Flag to prevent multiple pauses
-
-    typeSound.addEventListener('timeupdate', () => {
-      const currentTime = typeSound.currentTime
-      console.log('Current time:', currentTime)  // Debug current time
-      
-      AUDIO_BREAKS.forEach(({ time }) => {
-        // Wider time window for catching the break point
-        if (!isPaused && currentTime >= time && currentTime <= time + 0.2) {
-          console.log('Pausing at:', time)  // Debug pause points
-          isPaused = true
-          typeSound.pause()
-          
-          setTimeout(() => {
-            console.log('Resuming after:', time)  // Debug resume points
-            typeSound.play()
-            isPaused = false
-          }, 1000)
-        }
-      })
-    })
-
-    setAudio(typeSound)
-
-    return () => {
-      if (audio) {
-        audio.pause()
-        audio.currentTime = 0
-      }
+  const playNextSequence = async (index: number) => {
+    if (index >= SEQUENCE.length) {
+      setIsComplete(true)
+      return
     }
-  }, [])
 
-  const playTypeSound = () => {
-    if (audio) {
-      audio.currentTime = 0
-      audio.play()
+    // Cleanup previous audio if exists
+    if (currentAudio) {
+      currentAudio.pause()
+      currentAudio.removeEventListener('ended', () => {})
+    }
+
+    const audio = new Audio(SEQUENCE[index].audioFile)
+    audio.volume = 0.3
+    setCurrentAudio(audio)
+    setCurrentIndex(index)
+    
+    try {
+      // Define the ended handler
+      const handleEnded = () => {
+        console.log(`Audio ${index + 1} ended`); // Debug log
+        setTimeout(() => {
+          playNextSequence(index + 1)
+        }, SEQUENCE[index].pause)
+      }
+
+      // Add the event listener
+      audio.addEventListener('ended', handleEnded)
+      await audio.play()
+
+      // Cleanup when component unmounts or audio changes
+      return () => {
+        audio.removeEventListener('ended', handleEnded)
+      }
+    } catch (error) {
+      console.error('Audio playback failed:', error)
     }
   }
 
   return (
-    <div 
-      className="min-h-screen flex flex-col items-center justify-top md:justify-center justify-start bg-black text-white p-8 pt-24 md:p-4"
-      onClick={() => {
-        if (!hasInteracted && audio) {
-          setHasInteracted(true)
-          audio.play()
-        }
-      }}
-    >
+    <div className="min-h-screen flex flex-col items-center justify-top md:justify-center justify-start bg-black text-white p-12 pt-24 md:p-4">
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="max-w-2xl text-left"
       >
         {!showTyping ? (
-          <div className={`${typewriterFont.className} text-xl md:text-2xl mb-8 cursor-pointer`}
-               onClick={() => {
-                 setShowTyping(true)
-                 if (audio) {
-                   audio.play()
-                 }
-               }}>
+          <div 
+            className={`${typewriterFont.className} text-xl md:text-2xl mb-8 cursor-pointer`}
+            onClick={() => {
+              setShowTyping(true)
+              playNextSequence(0)
+            }}
+          >
             <span className="animate-pulse">|</span>
             <span className="animate-fade-in-slow"> tap here to begin</span>
           </div>
@@ -136,7 +117,7 @@ export default function WelcomePage() {
                 autoStart: true
               }}
               onInit={(typewriter) => {
-                TYPING_SEQUENCE.forEach(({ text, pause }) => {
+                SEQUENCE.forEach(({ text, pause }) => {
                   typewriter
                     .typeString(text)
                     .pauseFor(pause)
