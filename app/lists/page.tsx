@@ -89,7 +89,7 @@ export default function ListsPage() {
   )
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 pl-12 pr-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div className="relative flex-1 w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -107,7 +107,7 @@ export default function ListsPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {!isLoading && filteredLists.map((list) => (
           <ListCard
             key={list.id}
@@ -116,7 +116,7 @@ export default function ListsPage() {
             movieCount={list.movieCount}
             showCount={list.showCount}
             thumbnails={list.items
-              .slice(0, 4)
+              .slice(0, 3)
               .map(item => item.posterPath)
               .filter((poster): poster is string => Boolean(poster))
             }

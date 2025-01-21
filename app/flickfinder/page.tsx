@@ -157,7 +157,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-2 sm:px-0 py-4 sm:py-6">
+    <div className="container mx-auto px-2 sm:px-0 pl-12 pr-12 pt-12 py-4 sm:py-6">
       <div className="flex flex-col lg:flex-row lg:items-start lg:gap-12">
         {/* Form Section - Now with flex-shrink-0 */}
         <div className="flex-shrink-0 lg:max-w-2xl w-full">
@@ -413,7 +413,7 @@ export default function DashboardPage() {
                 <div className="flex w-max space-x-4 p-4">
                   {recommendations.map((movie) => (
                     <div key={movie.imdbID} className="w-[280px] flex-none">
-                      <div className="bg-gray-50 rounded-lg p-4 h-full">
+                      <div className="bg-gray-50 rounded-lg border border-gray-200 p-4  h-full">
                         <div className="flex flex-col gap-4">
                           {/* Image container */}
                           <div className="relative w-full aspect-[2/3]">
@@ -430,12 +430,12 @@ export default function DashboardPage() {
                             <p className="text-sm text-gray-600 line-clamp-2 leading-snug">{movie.Plot}</p>
                             
                             <div className="grid grid-cols-2 gap-2">
-                              <div className="bg-white p-2 rounded">
+                              <div className="bg-gray-50 p-2 rounded">
                                 <div className="text-xs text-gray-600 truncate">IMDB</div>
                                 <div className="font-bold text-sm">{movie.imdbRating}/10</div>
                               </div>
                               {movie.Ratings?.find(r => r.Source === "Rotten Tomatoes") && (
-                                <div className="bg-white p-2 rounded">
+                                <div className="bg-gray-50 p-2 rounded">
                                   <div className="text-xs text-gray-600 truncate">Rotten Tomatoes</div>
                                   <div className="font-bold text-sm">
                                     {movie.Ratings.find(r => r.Source === "Rotten Tomatoes")?.Value}
@@ -462,7 +462,7 @@ export default function DashboardPage() {
             {/* Desktop View */}
             <div className="hidden lg:flex lg:flex-col lg:space-y-4">
               {recommendations.map((movie) => (
-                <div key={movie.imdbID} className="bg-gray-50 rounded-lg p-6 w-full">
+                <div key={movie.imdbID} className="bg-gray-50 rounded-lg border border-gray-200 p-6 w-full">
                   <div className="flex gap-4">
                     {/* Left side - Image */}
                     <div className="w-[120px] h-[180px] flex-shrink-0">
